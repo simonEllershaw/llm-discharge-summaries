@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "discharge-summaries"
+version = "0.1.0"
+description = ""
+authors = ["simonEllershaw <simje@live.co.uk>"]
+readme = "README.md"
+packages = [{include = "discharge_summaries"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+jupyter = "^1.0.0"
+pandas = "^2.0.2"
+scikit-learn = "^1.2.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
