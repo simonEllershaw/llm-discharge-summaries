@@ -35,5 +35,5 @@ filter_files = true
 [tool.mypy]
 
 [[tool.mypy.overrides]]
-module = ["pydantic", "pandas", "sklearn.*", "tiktoken", "rich"]
+module = ["pydantic", "pandas", "sklearn.*", "tiktoken", "rich", "tqdm.*", "spacy", "medcat.*", "numpy", "dotenv"]
 ignore_missing_imports = true
