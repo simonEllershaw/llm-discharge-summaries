@@ -13,6 +13,9 @@ class Message(BaseModel):
     role: Role
     content: str
 
+    class Config:
+        use_enum_values = True
+
 
 def print_messages(messages: list[Message]) -> None:
     for message in messages:

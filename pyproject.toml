@@ -16,6 +16,7 @@ python-dotenv = "^1.0.0"
 openai = "^0.27.8"
 rich = "^13.4.2"
 pydantic = "^1.10"
+langchain = "^0.0.226"
 
 
 [build-system]
@@ -33,7 +34,4 @@ profile = "black"
 filter_files = true
 
 [tool.mypy]
-
-[[tool.mypy.overrides]]
-module = ["pydantic", "pandas", "sklearn.*", "tiktoken", "rich", "tqdm.*", "spacy", "medcat.*", "numpy", "dotenv"]
 ignore_missing_imports = true
