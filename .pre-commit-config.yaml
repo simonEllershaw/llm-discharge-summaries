@@ -35,7 +35,7 @@ repos:
         entry: nbqa autoflake -i
         name: nbqa-autoflake
         alias: nbqa-autoflake
-        additional_dependencies: [autoflake==2.1.1]
+        additional_dependencies: [autoflake==2.2.0]
       - id: nbqa-flake8
         additional_dependencies: [flake8==6.0.0]
       - id: nbqa-mypy
@@ -54,7 +54,7 @@ repos:
     hooks:
     -   id: pyupgrade
   - repo: https://github.com/PyCQA/autoflake
-    rev: v2.1.1
+    rev: v2.2.0
     hooks:
     -   id: autoflake
   - repo: https://github.com/pycqa/flake8

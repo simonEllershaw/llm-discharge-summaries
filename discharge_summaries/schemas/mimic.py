@@ -1,6 +1,6 @@
-import re
-
 from pydantic import BaseModel, validator
+
+from discharge_summaries.schemas.output import Paragraph
 
 
 class Note(BaseModel):
@@ -14,6 +14,9 @@ class Note(BaseModel):
 
 
 class DischargeSummary(Note):
+    bhc: str
+    bhc_paragraphs: list[Paragraph]
+
     @validator("category")
     def category_must_be_discharge_summary(cls, v):
         if v != "Discharge summary":
@@ -25,25 +28,6 @@ class DischargeSummary(Note):
         if v != "Report":
             raise ValueError("must be Report")
         return v
-
-    @property
-    def bhc(self) -> str:
-        start_pattern = r"\nBrief Hospital Course:\n"
-        end_pattern = r"\nMedications on Admission:\n"
-        match = re.search(f"{start_pattern}(.*?){end_pattern}", self.text, re.DOTALL)
-        if not match:
-            return ""
-        return match.group(1)
-
-    @property
-    def bhc_sections(self) -> list[str]:
-        return re.split("\n\n", self.bhc)
-
-    @property
-    def prefixes(self) -> list[str]:
-        return [
-            re.split(":|-", section, maxsplit=1)[0] for section in self.bhc_sections[1:]
-        ]
 
 
 class Record(BaseModel):
