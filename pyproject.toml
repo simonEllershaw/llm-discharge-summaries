@@ -10,12 +10,10 @@ packages = [{include = "discharge_summaries"}]
 python = "^3.10"
 medcat = "1.7.0"
 jupyter = "^1.0.0"
-pandas = "^2.0.2"
 mypy = "^1.4.0"
 python-dotenv = "^1.0.0"
 openai = "^0.27.8"
 rich = "^13.4.2"
-langchain = "^0.0.226"
 rouge-score = "^0.1.2"
 bert-score = "^0.3.13"
 summac = {git = "https://github.com/simonEllershaw/summac.git"}
