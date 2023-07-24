@@ -1,6 +1,7 @@
 data/*
 models/*
 *.bin
+*.json
 
 .DS_Store
 # Byte-compiled / optimized / DLL files
