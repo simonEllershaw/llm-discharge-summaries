@@ -16,7 +16,6 @@ openai = "^0.27.8"
 rich = "^13.4.2"
 rouge-score = "^0.1.2"
 bert-score = "^0.3.13"
-summac = {git = "https://github.com/simonEllershaw/summac.git"}
 nltk = "^3.8.1"
 sentencepiece = "^0.1.99"
 protobuf = "~3.20.0"
