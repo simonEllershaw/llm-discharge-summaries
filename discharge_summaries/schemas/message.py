@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List
 
 from pydantic import BaseModel
 
@@ -17,7 +18,7 @@ class Message(BaseModel):
         use_enum_values = True
 
 
-def print_messages(messages: list[Message]) -> None:
+def print_messages(messages: List[Message]) -> None:
     for message in messages:
         print(message.role)
         print(message.content)

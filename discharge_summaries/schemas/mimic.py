@@ -1,3 +1,5 @@
+from typing import List
+
 from pydantic import BaseModel, validator
 
 from discharge_summaries.schemas.output import Paragraph
@@ -15,7 +17,7 @@ class Note(BaseModel):
 
 class DischargeSummary(Note):
     bhc: str
-    bhc_paragraphs: list[Paragraph]
+    bhc_paragraphs: List[Paragraph]
 
     @validator("category")
     def category_must_be_discharge_summary(cls, v):
@@ -31,7 +33,7 @@ class DischargeSummary(Note):
 
 
 class Record(BaseModel):
-    physician_notes: list[Note]
+    physician_notes: List[Note]
     discharge_summary: DischargeSummary
     hadm_id: int
     subject_id: int

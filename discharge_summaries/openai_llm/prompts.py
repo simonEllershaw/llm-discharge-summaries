@@ -1,9 +1,11 @@
+from typing import List
+
 from discharge_summaries.openai_llm.message import Message, Role
 
 
 def generate_diagnosis_summary_prompt(
-    diagnosis: str, ehr_extracts: list[str]
-) -> list[Message]:
+    diagnosis: str, ehr_extracts: List[str]
+) -> List[Message]:
     system_message = Message(
         role=Role.SYSTEM,
         content=f"""You are an expert medical assistant aiding a user to write a patient's discharge summary.
