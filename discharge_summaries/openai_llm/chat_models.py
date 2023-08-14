@@ -59,7 +59,7 @@ class AzureOpenAIChatModel(ChatModel):
 
     async def aquery(self, messages: List[Message], num_retries=0) -> Message:
         try:
-            response = openai.ChatCompletion.create(
+            response = await openai.ChatCompletion.acreate(
                 engine=self.engine,
                 messages=[message.dict() for message in messages],
                 temperature=self.temperature,

@@ -29,6 +29,6 @@ class MedCATSpan(BaseModel):
             name=cat.cdb.get_name(cui),
             type_ids=list(cat.cdb.cui2type_ids.get(cui, "")),
             context=context if context else "",
-            meta_anns=span._.meta_anns if hasattr(span._, "meta_anns") else {},
+            meta_anns=span._.meta_anns if span._.meta_anns else {},
             datetime=datetime,
         )
