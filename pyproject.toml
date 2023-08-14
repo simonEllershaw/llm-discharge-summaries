@@ -8,7 +8,7 @@ packages = [{include = "discharge_summaries"}]
 
 [tool.poetry.dependencies]
 python = "~3.8"
-medcat = "1.7.0"
+medcat = "^1.9.0"
 jupyter = "^1.0.0"
 mypy = "^1.4.0"
 python-dotenv = "^1.0.0"
@@ -20,8 +20,6 @@ nltk = "^3.8.1"
 sentencepiece = "^0.1.99"
 protobuf = "~3.20.0"
 matplotlib = "^3.7.2"
-scispacy = "^0.5.2"
-en-core-sci-md = {url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.1/en_core_sci_md-0.5.1.tar.gz"}
 
 
 [build-system]
