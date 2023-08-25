@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 from discharge_summaries.openai_llm.message import Message, Role
 
@@ -30,3 +30,38 @@ $[concise summary of information in the extracts regarding the diagnosis]
     )
 
     return [system_message, user_message]
+
+
+def generate_bhc_paragraph_heading_extraction_prompt(
+    bhc_paragraph: str, examples: List[Tuple[str, str]]
+) -> List[Message]:
+    PREFIX = "What is the heading of this paragraph?\n\n"
+
+    system_message = Message(
+        role=Role.SYSTEM,
+        content="""You are an expert-level assistant that extracts the headings that prefix a user's paragraph.
+A heading is the first 2-5 words of a paragraph that is usually seperated from the main text by a colon.
+You can either reply with None or an exact string match from the user text.""",
+    )
+
+    few_shot_examples = []
+    for example_input, example_output in examples:
+        few_shot_examples.append(
+            Message(
+                role=Role.USER,
+                content=f"{PREFIX}{example_input}",
+            )
+        )
+        few_shot_examples.append(
+            Message(
+                role=Role.ASSISTANT,
+                content=example_output,
+            )
+        )
+
+    user_message = Message(
+        role=Role.USER,
+        content=f"{PREFIX}{bhc_paragraph}",
+    )
+
+    return [system_message, *few_shot_examples, user_message]
