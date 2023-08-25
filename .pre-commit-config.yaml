@@ -15,8 +15,8 @@ repos:
       - id: check-yaml
       - id: check-json
       - id: check-toml
-      - id: pretty-format-json
-        args: ['--autofix']
+      # - id: pretty-format-json
+      #   args: ['--autofix']
       - id: check-merge-conflict
       - id: check-case-conflict
       - id: check-docstring-first
