@@ -22,6 +22,8 @@ protobuf = "~3.20.0"
 matplotlib = "^3.7.2"
 typing-extensions = "<4.6.0"
 torch = ">=2.0.0, !=2.0.1"
+evaluate = "^0.4.0"
+seqeval = "^1.2.2"
 
 
 [build-system]
