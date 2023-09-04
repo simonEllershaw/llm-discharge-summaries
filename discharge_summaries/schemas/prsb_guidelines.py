@@ -13,4 +13,5 @@ class Element(BaseModel):
 class Section(BaseModel):
     name: str
     description: str
+    is_record: bool
     elements: List[Element]
