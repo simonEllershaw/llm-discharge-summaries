@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{include = "discharge_summaries"}]
 
 [tool.poetry.dependencies]
-python = "~3.8"
+python = "~3.11"
 jupyter = "^1.0.0"
 mypy = "^1.4.0"
 python-dotenv = "^1.0.0"
@@ -19,17 +19,18 @@ nltk = "^3.8.1"
 sentencepiece = "^0.1.99"
 protobuf = "~3.20.0"
 matplotlib = "^3.7.2"
-typing-extensions = "<4.6.0"
 torch = ">=2.0.0, !=2.0.1"
 evaluate = "^0.4.0"
 seqeval = "^1.2.2"
-scispacy = "^0.5.2"
-en-core-sci-md = {url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.1/en_core_sci_md-0.5.1.tar.gz"}
 tiktoken = "^0.4.0"
 openpyxl = "^3.1.2"
 sentence-transformers = "^2.2.2"
 jsonschema = "^4.19.0"
-
+transformers = "4.31.0"
+ninja = "^1.11.1"
+packaging = "^23.1"
+pydantic = "^2.3.0"
+huggingface-hub = "^0.17.1"
 
 [build-system]
 requires = ["poetry-core"]
