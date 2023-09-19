@@ -70,10 +70,10 @@ class Snomed:
         return parent_cui_to_child_cuis
 
     def get_preferred_term(self, cui: str) -> str:
-        return self.preferred_term_df[self.preferred_term_df.cui == cui].name.values[0]
+        return self.preferred_term_df[self.preferred_term_df.cui == cui].name.tolist()[0]
 
     def get_synonyms(self, cui: str) -> str:
-        return self.synonyms_df[self.synonyms_df.cui == cui].name.values.to_list()
+        return self.synonyms_df[self.synonyms_df.cui == cui].name.tolist()
 
     def get_child_cuis(self, parent_cui: str) -> Set[str]:
         direct_child_cuis = self.parent_to_child_cuis[parent_cui]
