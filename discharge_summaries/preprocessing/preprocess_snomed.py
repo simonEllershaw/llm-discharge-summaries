@@ -1,7 +1,7 @@
 import re
 from collections import defaultdict
 from pathlib import Path
-from typing import Set, Tuple
+from typing import List, Set, Tuple
 
 import pandas as pd
 from tqdm.notebook import tqdm
@@ -44,6 +44,7 @@ class Snomed:
             lambda row: re.sub(r" \(.*?\)$", "", row["name"]), axis=1
         )
         preferred_term_df = preferred_term_df.drop_duplicates(["cui"], keep="first")
+        preferred_term_df.set_index("cui", inplace=True)
 
         synonyms_df = description_df[
             description_df["typeId"] == self.SYNONYM_TERM_ID
@@ -70,9 +71,9 @@ class Snomed:
         return parent_cui_to_child_cuis
 
     def get_preferred_term(self, cui: str) -> str:
-        return self.preferred_term_df[self.preferred_term_df.cui == cui].name.tolist()[0]
+        return self.preferred_term_df.loc[cui].values[0]
 
-    def get_synonyms(self, cui: str) -> str:
+    def get_synonyms(self, cui: str) -> List[str]:
         return self.synonyms_df[self.synonyms_df.cui == cui].name.tolist()
 
     def get_child_cuis(self, parent_cui: str) -> Set[str]:
