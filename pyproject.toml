@@ -13,7 +13,6 @@ mypy = "^1.4.0"
 python-dotenv = "^1.0.0"
 openai = "^0.27.8"
 rich = "^13.4.2"
-rouge-score = "^0.1.2"
 bert-score = "^0.3.13"
 nltk = "^3.8.1"
 sentencepiece = "^0.1.99"
@@ -32,6 +31,7 @@ huggingface-hub = "^0.17.1"
 medcat = "1.5"
 typing-inspect = "0.8.0"
 typing-extensions = "4.5.0"
+pypdf2 = "^3.0.1"
 
 [build-system]
 requires = ["poetry-core"]
