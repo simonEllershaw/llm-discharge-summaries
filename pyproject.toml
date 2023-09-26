@@ -32,6 +32,7 @@ medcat = "1.5"
 typing-inspect = "0.8.0"
 typing-extensions = "4.5.0"
 pypdf2 = "^3.0.1"
+unidecode = "^1.3.6"
 
 [build-system]
 requires = ["poetry-core"]
