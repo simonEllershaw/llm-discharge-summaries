@@ -11,6 +11,7 @@ def num_tokens_from_messages_azure_engine(
     azure_engine_and_version_to_openai_model = {
         "gpt-35-turbo-2023-07-01-preview": "gpt-3.5-turbo-0613",
         "gpt-4-32k-2023-07-01-preview": "gpt-4-32k-0613",
+        "gpt-4-2023-07-01-preview": "gpt-4-0613",
     }
     try:
         model = azure_engine_and_version_to_openai_model[
