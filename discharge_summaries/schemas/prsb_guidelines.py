@@ -144,7 +144,7 @@ class PatientDemographics(BaseModel):
     #         "The unique identifier for a patient within the NHS in England and Wales."
     #     )
     # )
-    other_identifier: str = Field(
+    other_identifier: List[str] = Field(
         description=(
             "Country specific or local identifier, e.g., Community Health Index (CHI)"
             " in Scotland. Two data items: type of identifier and identifier."
@@ -466,14 +466,14 @@ class MedicationItem(BaseModel):
             ' prescriber. Comment: e.g. "Modified Release Capsules"'
         )
     )
-    quantity_supplied: str = Field(
+    quantity_supplied: List[str] = Field(
         description=(
             "The quantity of the medication (eg tablets, inhalers, etc.) provided to"
             " the patient on discharge. This may be dispensed by the pharmacy or on the"
             " ward."
         )
     )
-    route: str = Field(
+    route: List[str] = Field(
         description=(
             "Medication administration description (oral, IM, IV, etc.): may include"
             " method of administration, (e.g., by infusion, via nebuliser, via NG"
@@ -526,7 +526,7 @@ class MedicationItem(BaseModel):
             " continued, including direction not to discontinue."
         )
     )
-    additional_instructions: str = Field(
+    additional_instruction: str = Field(
         description=(
             "Additional multiple dosage or administration instructions as plain text."
             " This may include guidance to the prescriber, patient or person"
@@ -539,7 +539,7 @@ class MedicationItem(BaseModel):
     )
 
 
-class MedicationChange(BaseModel):
+class MedicationChangeSummary(BaseModel):
     """ "Records the changes made to medication since admission"""
 
     status: str = Field(
@@ -565,7 +565,7 @@ class MedicationChange(BaseModel):
 class MedicationChangeItem(MedicationItem):
     # In a departure from PRSB guidance inherits from MedicationItem
     # This allows medication name etc... to still be recorded
-    medication_change_summary: MedicationChange
+    medication_change_summary: MedicationChangeSummary
 
 
 class MedicalDeviceEntry(BaseModel):
@@ -578,7 +578,7 @@ class MedicalDeviceEntry(BaseModel):
     )
 
 
-class MedicationDiscontinued(MedicationChange):
+class MedicationDiscontinued(MedicationChangeSummary):
     name_of_discontinued_medication: str = Field(
         description=(
             "Records medications / medical devices present on admission but"
@@ -588,7 +588,7 @@ class MedicationDiscontinued(MedicationChange):
             " an entry)"
         )
     )
-    comment_: str = Field(
+    comment: str = Field(
         description="Any additional comment about the medication change."
     )
 
@@ -615,7 +615,8 @@ class MedicationAndMedicalDevices(BaseModel):
             " (dm+d)."
         )
     )
-    medication_discontinued_entry: List[MedicationDiscontinued] = Field(
+    # Renamed to include item cluster convention
+    medication_discontinued_item_cluster: List[MedicationDiscontinued] = Field(
         description=(
             "Records medications / medical devices present on admission but"
             " subsequently discontinued.(This will broadly follow the same structure as"
