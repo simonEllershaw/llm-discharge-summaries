@@ -1493,6 +1493,17 @@ files = [
 ]
 
 [[package]]
+name = "jsonref"
+version = "1.1.0"
+description = "jsonref is a library for automatic dereferencing of JSON Reference objects for Python."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "jsonref-1.1.0-py3-none-any.whl", hash = "sha256:590dc7773df6c21cbf948b5dac07a72a251db28b0238ceecce0a2abfa8ec30a9"},
+    {file = "jsonref-1.1.0.tar.gz", hash = "sha256:32fe8e1d85af0fdefbebce950af85590b22b60f9e95443176adbde4e1ecea552"},
+]
+
+[[package]]
 name = "jsonschema"
 version = "4.19.0"
 description = "An implementation of JSON Schema validation for Python"
@@ -5169,4 +5180,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.8"
-content-hash = "c8d0ca1a6e4a257a22b16f24555368c1ecb0f2b8e1f7038137f8420513752a0b"
+content-hash = "0095cf2b9a2230c3974affdd0344d1d9e437d6eaeb44cf5c702ebe13dab32c5b"

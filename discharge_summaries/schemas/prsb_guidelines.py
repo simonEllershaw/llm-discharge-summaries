@@ -554,7 +554,7 @@ class MedicationItem(BaseModel):
 
 
 class MedicationChangeSummary(BaseModel):
-    """ "Records the changes made to medication since admission"""
+    """Records the changes made to medication since admission"""
 
     status: str = Field(
         description=(
@@ -617,7 +617,7 @@ class MedicationDiscontinued(MedicationChangeSummary):
 
 
 class MedicationAndMedicalDevices(BaseModel):
-    """ "The details of and instructions for medications and medical equipment the patient is using."""
+    """The details of and instructions for medications and medical equipment the patient is using."""
 
     medication_item_cluster: List[MedicationItem] = Field(
         description=(
@@ -703,7 +703,7 @@ class AllergyOrAdverseReaction(BaseModel):
 
 
 class ExpectationsAndWishes(BaseModel):
-    """ "A description of the concerns, expectations or wishes of the patient."""
+    """A description of the concerns, expectations or wishes of the patient."""
 
     expectations_and_wishes: str = Field(
         description=(
@@ -768,7 +768,7 @@ class PlanAndRequestedActions(BaseModel):
 
 
 class PersonCompletingRecord(BaseModel):
-    """ "The details of the person who filled out the record."""
+    """The details of the person who filled out the record."""
 
     name: str = Field(
         description=(
@@ -848,7 +848,7 @@ class DistributionListRecordEntry(BaseModel):
     )
 
 
-class PRSBGuidelines(BaseModel):
+class DischargeSummary(BaseModel):
     patient_demographics: PatientDemographics
 
     # MIMIC is a US dataset so NHS Number is not applicable
