@@ -138,12 +138,11 @@ class PatientDemographics(BaseModel):
     gender: str = Field(
         description="The patient's gender. As the patient wishes to portray themselves."
     )
-    # MIMIC is a US dataset so NHS Number is not applicable
-    # nhs_number: str = Field(
-    #     description=(
-    #         "The unique identifier for a patient within the NHS in England and Wales."
-    #     )
-    # )
+    nhs_number: str = Field(
+        description=(
+            "The unique identifier for a patient within the NHS in England and Wales."
+        )
+    )
     other_identifier: List[str] = Field(
         description=(
             "Country specific or local identifier, e.g., Community Health Index (CHI)"
@@ -189,7 +188,9 @@ class ReferrerDetails(BaseModel):
     """Details of the individual or team who referred the patient.
     If not an individual, this could be e.g. GP surgery, department, specialty,
     sub-specialty, educational institution, mental health team etc. Also needs
-    to include self-referral."""
+    to include self-referral.
+    Self-referral should be used where the patient is not referred or transferred
+    from a health/care organisation."""  # From implementation guidelines 4.3.2
 
     # Structure implicit instead of explicit in PRSB guidelines
     # "Name, role, grade, organisation and contact details of referrer."
@@ -301,11 +302,18 @@ class Diagnosis(BaseModel):
     diagnosis_name: str = Field(
         description="Confirmed diagnosis (or symptom); active diagnosis being treated."
     )
-    diagnosis_stage: str = Field(description="Stage of the disease, where relevant.")
+    stage: str = Field(description="Stage of the disease, where relevant.")
+    # Additional field based on 4.4.8 of implementation guidance
+    primary_diagnosis: bool = Field(
+        description="True if main/primary diagnosis. False otherwise"
+    )
     comment: str = Field(
         description=(
             "Supporting text may be given covering diagnosis confirmation, active"
             " diagnosis being treated."
+            # From 4.4.7 of implementation guidance
+            " In some situations a diagnosis may need to be qualified by a number of"
+            " attributes to give further detail."
         )
     )
 
@@ -333,6 +341,8 @@ class Procedure(BaseModel):
         description=(
             "Any further textual comment to clarify such as statement that information"
             " is partial or incomplete."
+            # From 4.5.2 of implementation guidance
+            " Outcomes or results of procedures should be recorded"
         )
     )
 
@@ -524,6 +534,10 @@ class MedicationItem(BaseModel):
         description=(
             "Recommendation of the time period for which the medication should be"
             " continued, including direction not to discontinue."
+            # From implementation guidance 4.9.5
+            " 'continue medication indefinitely'- ongoing treatment planned. 'do not"
+            " discontinue' refers to medication where suddenly stopping could be"
+            " dangerous"
         )
     )
     additional_instruction: str = Field(
@@ -543,7 +557,16 @@ class MedicationChangeSummary(BaseModel):
     """ "Records the changes made to medication since admission"""
 
     status: str = Field(
-        description="The nature of any change made to the medication since admission."
+        description=(
+            "The nature of any change made to the medication since admission. Continued"
+            # Values from values column
+            " [Medicine present on both admission and discharge with no amendments.]."
+            " Added [Medicine present on discharge but not on admission]. Amended"
+            " [Medicine present on both admission and discharge but with amendment(s)"
+            " since admission.]. On-hold [Suspended with the intention that they are to"
+            " be reinstated at some point in the future]. Discontinued [The medication"
+            " is no longer to be taken by the patient]"
+        )
     )
     indication: str = Field(
         description=(
@@ -729,12 +752,17 @@ class PlanAndRequestedActions(BaseModel):
         description=(
             "Investigations requested by the clinician, including the reason for the"
             " request, the date of the request and the date of the result."
+            # Manual prompt
+            " Only include investigations that have been requested but not yet"
+            " carried out"
         )
     )
     procedures_requested: List[str] = Field(
         description=(
             "These are the diagnostic or therapeutic procedures that have actually been"
             " requested (and the date requested)."
+            # Manual prompt
+            " Only include procedures that have been requested but not yet carried out"
         )
     )
 
@@ -837,6 +865,8 @@ class PRSBGuidelines(BaseModel):
         )
     )
     participation_in_research: List[str] = Field(
+        # Noting that implementation guidance suggests also including drug/intervention
+        # name and if patient is still participating (see implementation guidance 4.6)
         description="The names of any research studies participated in."
     )
     admission_details: AdmissionDetails
@@ -844,9 +874,25 @@ class PRSBGuidelines(BaseModel):
     # Cannot be auto-filled from notes as only defined in discharge summary itself
     # discharge_details: DischargeDetails
 
-    diagnoses: List[Diagnosis] = Field(description="A list of the patient's diagnoses.")
+    diagnoses: List[Diagnosis] = Field(
+        # Added extracts from 4.4.1-4.4.6 of implementation guidelines
+        description=(
+            "A list of the patient's the main diagnosis / diagnoses that were important"
+            " during the admission (or symptom(s) if no diagnosis), including any new"
+            " diagnosis that came to light during the admission. When a diagnosis has"
+            " not yet been made, the most granular clinical concept with the highest"
+            " level of certainty should be recorded. Co-morbidities' should be recorded"
+            " as separate diagnoses. Unconfirmed or excluded diagnoses should not be"
+            " recorded. Diagnoses may also be problems or issues"
+        )
+    )
     procedures: List[Procedure] = Field(
-        description="The details of any procedures performed."
+        description=(
+            "The details of any procedures performed"
+            # From 4.5.1 of implementation guidance
+            " Including: diagnostic as well as therapeutic procedures, diagnostic as"
+            " well as therapeutic procedures."
+        )
     )
     clinical_summary: str = Field(
         description=(
@@ -855,18 +901,24 @@ class PRSBGuidelines(BaseModel):
             " and specific action(s). Planned actions will be recorded under 'plan'."
         )
     )
-    investigation_results: List[str] = Field(
+    investigation_results: List[InvestigationResult] = Field(
         description=(
             "A list of investigations and procedures requested, results and plans. For"
             " each investigation, the result of the investigation (this includes the"
             " result value, with unit of observation and reference interval where"
             " applicable and date, and plans for acting upon investigation results."
+            # From values column
+            " This should include only results which are important or relevant to"
+            " communicate to the GP."
         )
     )
     assessment_scale: List[str] = Field(
         description=(
             "Description of any assessment scales used eg New York Heart Failure,"
-            " Activities of Daily Living (ADL)"
+            " Activities of Daily Living (ADL)."
+            # From values column
+            " Content could include scale name, date and time of assessment and values"
+            " recorded, including overall score."
         )
     )
     legal_information: LegalInformation
@@ -875,6 +927,9 @@ class PRSBGuidelines(BaseModel):
     allergies_and_adverse_reactions: List[AllergyOrAdverseReaction] = Field(
         description=(
             "The details of any known allergies, intolerances or adverse reactions."
+            # From implementation guidelines 4.10.1
+            " Including allergies that the patient tells the hospital about and"
+            " allergic and adverse reactions related to their admission."
         )
     )
     expectations_and_wishes: ExpectationsAndWishes
@@ -883,6 +938,10 @@ class PRSBGuidelines(BaseModel):
             "A record of any information or advice given to the patient, carer or"
             " relevant third party. This includes:-what information-to whom it was"
             " given."
+            # Implementation guidance 4.14.2
+            " It is important that this is concise and is only information which it is"
+            " pertinent for the GP to be aware of e.g simply state that the patient was"
+            " provided with a pamphlet"
         )
     )
     plan_and_requested_actions: PlanAndRequestedActions
