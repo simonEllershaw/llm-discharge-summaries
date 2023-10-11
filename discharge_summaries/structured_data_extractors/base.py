@@ -47,11 +47,11 @@ class BaseStructuredDataExtractor:
 
     def complete_social_context(self, hadm_id) -> SocialContext:
         return SocialContext(
-            household_composition="", occupational_history="", educational_history=""
+            household_composition="", occupational_history=[], educational_history=""
         )
 
-    def complete_individual_requirements(self, hadm_id) -> str:
-        return ""
+    def complete_individual_requirements(self, hadm_id) -> List[str]:
+        return []
 
     def complete_participation_in_research(self, hadm_id) -> List[str]:
         return []
