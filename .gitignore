@@ -2,7 +2,7 @@ data/*
 models/*
 *.bin
 *.json
-
+*/output/*
 !data/developer_nhs_uk_gt.json
 !data/prsb_example_gt.json
 
