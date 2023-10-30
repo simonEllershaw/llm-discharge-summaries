@@ -1,7 +1,7 @@
 import json
 import re
 from pathlib import Path
-from typing import Dict, Set, Tuple
+from typing import Dict, Optional, Set, Tuple
 
 import pandas as pd
 from spacy.matcher import PhraseMatcher
@@ -12,6 +12,8 @@ class Snomed:
     PREFERRED_TERM_ID = "900000000000003001"
     SYNONYM_TERM_ID = "900000000000013009"
     IS_A_RELATIONSHIP_ID = "116680003"
+
+    ACRONYM_REGEX = re.compile(r"^[A-Z]{2,4}(?= - )")
 
     def __init__(
         self,
@@ -42,11 +44,19 @@ class Snomed:
             }
             return direct_child_cuis.union(recursive_child_cuis)
 
-    def get_phrase_matcher(self, cuis: Set[int], tokenizer: Tokenizer) -> PhraseMatcher:
+    def get_phrase_matcher(
+        self, names: Set[str], tokenizer: Tokenizer
+    ) -> PhraseMatcher:
+        cuis = {cui for name in names for cui in self.get_cuis(name)}
+        if not cuis:
+            raise ValueError(f"No CUIs found for names: {names}")
+        child_cuis = {
+            child_cui for cui in cuis for child_cui in self.get_child_cuis(cui)
+        }
         snomed_matcher = PhraseMatcher(tokenizer.vocab, "LOWER")
-        for cui in cuis:
+        for cui in cuis.union(child_cuis):
             synonyms = self.cui_to_synonyms.get(cui, set())
-            snomed_matcher.add(cui, list(tokenizer.pipe(synonyms)))
+            snomed_matcher.add(str(cui), list(tokenizer.pipe(synonyms)))
         return snomed_matcher
 
     @staticmethod
@@ -76,6 +86,14 @@ class Snomed:
         return set(concept_df.id.astype("int64").tolist())
 
     @staticmethod
+    def _extract_acronym(row: pd.Series) -> Optional[pd.Series]:
+        match = Snomed.ACRONYM_REGEX.match(row["name"])
+        if match and match.group(0) != len(row["name"]):
+            return {"cui": row["cui"], "name": match.group(0)}
+        else:
+            return None
+
+    @staticmethod
     def _load_preferred_and_synonym_dfs_from_file(
         int_description_filepath: Path,
         uk_ext_description_filepath: Path,
@@ -97,7 +115,6 @@ class Snomed:
         description_df = description_df[["cui", "name", "typeId"]].copy()
         description_df["cui"] = description_df["cui"].astype("int64")
         description_df["name"] = description_df["name"].astype("string")
-        description_df["name"] = description_df["name"].str.lower()
         description_df = description_df[description_df["cui"].isin(active_cuis)]
 
         preferred_terms_df = description_df[
@@ -107,6 +124,7 @@ class Snomed:
         preferred_terms_df["name"] = preferred_terms_df.apply(
             lambda row: re.sub(r" \(.*?\)$", "", row["name"]), axis=1
         )
+        preferred_terms_df["name"] = preferred_terms_df["name"].str.lower()
         preferred_terms_df = preferred_terms_df.drop_duplicates(["cui"], keep="first")
         preferred_terms_df = preferred_terms_df.set_index("cui")
         cui_to_preferred_term = preferred_terms_df.to_dict()["name"]
@@ -115,6 +133,15 @@ class Snomed:
             description_df["typeId"] == Snomed.SYNONYM_TERM_ID
         ].copy()
         synonyms_df.drop(columns=["typeId"], inplace=True)
+        acronyms_df = pd.DataFrame(
+            synonyms_df.apply(Snomed._extract_acronym, axis=1)
+            .dropna()
+            .reset_index(drop=True)
+            .tolist()
+        )
+        acronyms_df.drop_duplicates(inplace=True)
+        synonyms_df = pd.concat([synonyms_df, acronyms_df])
+        synonyms_df["name"] = synonyms_df["name"].str.lower()
         synonyms_df = synonyms_df.drop_duplicates()
         synonyms_df = (
             synonyms_df.groupby("cui")["name"].apply(set).reset_index().set_index("cui")
