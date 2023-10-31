@@ -60,6 +60,8 @@ class SnomedPhraseMatcher:
         snomed_matches = self._phrase_matcher(doc, as_spans=True)
         filtered_snomed_matches = _filter_out_subspans(snomed_matches)
         snomed_cuis = [int(span.label_) for span in filtered_snomed_matches]
+        if not snomed_cuis and "/" in doc.text:
+            return self(doc.text.replace("/", " "))
         return snomed_cuis
 
     def __call__(self, text: str) -> List[int]:
