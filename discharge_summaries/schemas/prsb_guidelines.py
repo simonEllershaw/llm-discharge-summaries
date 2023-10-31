@@ -184,23 +184,6 @@ class GPPractice(BaseModel):
     )
 
 
-class ReferrerDetails(BaseModel):
-    """Details of the individual or team who referred the patient.
-    If not an individual, this could be e.g. GP surgery, department, specialty,
-    sub-specialty, educational institution, mental health team etc. Also needs
-    to include self-referral.
-    Self-referral should be used where the patient is not referred or transferred
-    from a health/care organisation."""  # From implementation guidelines 4.3.2
-
-    # Structure implicit instead of explicit in PRSB guidelines
-    # "Name, role, grade, organisation and contact details of referrer."
-    name: str
-    role: str
-    grade: str
-    organisation: str
-    contact_details: str
-
-
 class SocialContext(BaseModel):
     """The social setting in which the patient lives, such as their household,
     occupational history, and lifestyle factors."""
@@ -856,7 +839,16 @@ class DischargeSummary(BaseModel):
     #     description="Details of the GP practice where the patient is registered."
     # )
 
-    referrer_details: ReferrerDetails
+    referrer_details: str = Field(
+        description=(
+            "Details of the individual or team who referred the patient. If not an"
+            " individual, this could be e.g. GP surgery, department, specialty,"
+            " sub-specialty, educational institution, mental health team etc. Also need"
+            # From implementation guidelines 4.3.2
+            " to include self-referral. Self-referral should be used where the patient"
+            " is not referred or transferred from a health/care organisation."
+        )
+    )
     social_context: SocialContext
     individual_requirements: List[str] = Field(
         description=(
@@ -872,7 +864,7 @@ class DischargeSummary(BaseModel):
     admission_details: AdmissionDetails
 
     # Cannot be auto-filled from notes as only defined in discharge summary itself
-    # discharge_details: DischargeDetails
+    discharge_details: DischargeDetails
 
     diagnoses: List[Diagnosis] = Field(
         # Added extracts from 4.4.1-4.4.6 of implementation guidelines
@@ -947,10 +939,10 @@ class DischargeSummary(BaseModel):
     plan_and_requested_actions: PlanAndRequestedActions
 
     # Cannot be auto-filled from notes as only defined in discharge summary itself
-    # discharge_details: DischargeDetails
-    # person_completing_record: PersonCompletingRecord
-    # distribution_list: List[DistributionListRecordEntry] = Field(
-    #     description=(
-    #         "A list of other individuals to receive a copy of this communication."
-    #     )
-    # )
+    discharge_details: DischargeDetails
+    person_completing_record: PersonCompletingRecord
+    distribution_list: List[DistributionListRecordEntry] = Field(
+        description=(
+            "A list of other individuals to receive a copy of this communication."
+        )
+    )

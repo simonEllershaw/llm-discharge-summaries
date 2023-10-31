@@ -209,7 +209,7 @@ class MIMICStructuredDataExtractor(BaseStructuredDataExtractor):
         item_entry: MedicationItem,
         most_recent_prescription: pd.Series,
         status: str,
-    ) -> MedicationChangeSummary:
+    ) -> MedicationChangeItem:
         medication_change_summary = MedicationChangeSummary(
             status=status,
             indication="",

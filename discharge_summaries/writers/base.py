@@ -16,6 +16,7 @@ from discharge_summaries.schemas.prsb_guidelines import (
     PersonCompletingRecord,
     PlanAndRequestedActions,
     Procedure,
+    ReferrerDetails,
     SafetyAlerts,
     SocialContext,
 )
@@ -33,7 +34,6 @@ class BaseStructuredDataExtractor:
             patient_preferred_name="",
             date_of_birth="",
             gender="",
-            # MIMIC is a US dataset so NHS Number is not applicable/known
             nhs_number="",
             other_identifier=[],
             patient_address="",
@@ -42,8 +42,10 @@ class BaseStructuredDataExtractor:
             relevant_contacts="",
         )
 
-    def complete_referrer_details(self, hadm_id) -> str:
-        return ""
+    def complete_referrer_details(self, hadm_id) -> ReferrerDetails:
+        return ReferrerDetails(
+            name="", role="", grade="", organisation="", contact_details=""
+        )
 
     def complete_social_context(self, hadm_id) -> SocialContext:
         return SocialContext(
@@ -135,7 +137,7 @@ class BaseStructuredDataExtractor:
             procedures_requested=[],
         )
 
-    def complete_discharge_details(self, hadm_id: str) -> DischargeDetails:
+    def complete_discharge_details(hadm_id: str) -> DischargeDetails:
         return DischargeDetails(
             discharging_consultant="",
             discharging_speciality_or_department="",
@@ -147,7 +149,7 @@ class BaseStructuredDataExtractor:
             discharge_address="",
         )
 
-    def complete_person_completing_record(self, hadm_id: str) -> PersonCompletingRecord:
+    def complete_person_completing_record(hadm_id: str) -> PersonCompletingRecord:
         return PersonCompletingRecord(
             name="",
             role="",
@@ -159,7 +161,7 @@ class BaseStructuredDataExtractor:
             organisation="",
         )
 
-    def complete_distribution_list(self, hadm_id: str) -> [DistributionListRecordEntry]:
+    def complete_distribution_list(hadm_id: str) -> [DistributionListRecordEntry]:
         return []
 
     def complete_prsb_discharge_summary(self, hadm_id: str) -> DischargeSummary:
