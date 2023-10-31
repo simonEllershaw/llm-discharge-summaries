@@ -4,11 +4,9 @@ from pathlib import Path
 from typing import Dict, Optional, Set, Tuple
 
 import pandas as pd
-from spacy.matcher import PhraseMatcher
-from spacy.tokenizer import Tokenizer
 
 
-class Snomed:
+class SnomedLookup:
     PREFERRED_TERM_ID = "900000000000003001"
     SYNONYM_TERM_ID = "900000000000013009"
     IS_A_RELATIONSHIP_ID = "116680003"
@@ -25,12 +23,12 @@ class Snomed:
         self.cui_to_synonyms = cui_to_synonyms
         self.parent_cui_to_child_cuis = parent_cui_to_child_cuis
 
-    def get_cuis(self, name: str) -> Set[int]:
-        return {
-            cui
-            for cui, synonyms in self.cui_to_synonyms.items()
-            if name.lower() in synonyms
-        }
+    # def get_cuis(self, name: str) -> Set[int]:
+    #     return {
+    #         cui
+    #         for cui, synonyms in self.cui_to_synonyms.items()
+    #         if name.lower() in synonyms
+    #     }
 
     def get_child_cuis(self, parent_cui: int) -> Set[int]:
         direct_child_cuis = self.parent_cui_to_child_cuis.get(parent_cui, set())
@@ -43,21 +41,6 @@ class Snomed:
                 for recursive_child_cui in self.get_child_cuis(child_cui)
             }
             return direct_child_cuis.union(recursive_child_cuis)
-
-    def get_phrase_matcher(
-        self, names: Set[str], tokenizer: Tokenizer
-    ) -> PhraseMatcher:
-        cuis = {cui for name in names for cui in self.get_cuis(name)}
-        if not cuis:
-            raise ValueError(f"No CUIs found for names: {names}")
-        child_cuis = {
-            child_cui for cui in cuis for child_cui in self.get_child_cuis(cui)
-        }
-        snomed_matcher = PhraseMatcher(tokenizer.vocab, "LOWER")
-        for cui in cuis.union(child_cuis):
-            synonyms = self.cui_to_synonyms.get(cui, set())
-            snomed_matcher.add(str(cui), list(tokenizer.pipe(synonyms)))
-        return snomed_matcher
 
     @staticmethod
     def _parse_snomed_file(
@@ -75,9 +58,9 @@ class Snomed:
         uk_ext_concept_filepath: Path,
         drug_ext_concept_filepath: Path,
     ) -> Set[int]:
-        int_concept_df = Snomed._parse_snomed_file(int_concept_filepath)
-        uk_concept_df = Snomed._parse_snomed_file(uk_ext_concept_filepath)
-        drug_concept_df = Snomed._parse_snomed_file(drug_ext_concept_filepath)
+        int_concept_df = SnomedLookup._parse_snomed_file(int_concept_filepath)
+        uk_concept_df = SnomedLookup._parse_snomed_file(uk_ext_concept_filepath)
+        drug_concept_df = SnomedLookup._parse_snomed_file(drug_ext_concept_filepath)
 
         concept_df = pd.concat(
             [int_concept_df, uk_concept_df, drug_concept_df], ignore_index=True
@@ -87,7 +70,7 @@ class Snomed:
 
     @staticmethod
     def _extract_acronym(row: pd.Series) -> Optional[pd.Series]:
-        match = Snomed.ACRONYM_REGEX.match(row["name"])
+        match = SnomedLookup.ACRONYM_REGEX.match(row["name"])
         if match and match.group(0) != len(row["name"]):
             return {"cui": row["cui"], "name": match.group(0)}
         else:
@@ -100,9 +83,11 @@ class Snomed:
         drug_ext_description_filepath: Path,
         active_cuis: Set[int],
     ) -> Tuple[Dict[int, str], Dict[int, Set[str]]]:
-        int_description_df = Snomed._parse_snomed_file(int_description_filepath)
-        uk_description_df = Snomed._parse_snomed_file(uk_ext_description_filepath)
-        drug_description_df = Snomed._parse_snomed_file(drug_ext_description_filepath)
+        int_description_df = SnomedLookup._parse_snomed_file(int_description_filepath)
+        uk_description_df = SnomedLookup._parse_snomed_file(uk_ext_description_filepath)
+        drug_description_df = SnomedLookup._parse_snomed_file(
+            drug_ext_description_filepath
+        )
         description_df = pd.concat(
             [int_description_df, uk_description_df, drug_description_df],
             ignore_index=True,
@@ -118,30 +103,28 @@ class Snomed:
         description_df = description_df[description_df["cui"].isin(active_cuis)]
 
         preferred_terms_df = description_df[
-            description_df["typeId"] == Snomed.PREFERRED_TERM_ID
+            description_df["typeId"] == SnomedLookup.PREFERRED_TERM_ID
         ].copy()
         preferred_terms_df.drop(columns=["typeId"], inplace=True)
         preferred_terms_df["name"] = preferred_terms_df.apply(
             lambda row: re.sub(r" \(.*?\)$", "", row["name"]), axis=1
         )
-        preferred_terms_df["name"] = preferred_terms_df["name"].str.lower()
         preferred_terms_df = preferred_terms_df.drop_duplicates(["cui"], keep="first")
         preferred_terms_df = preferred_terms_df.set_index("cui")
         cui_to_preferred_term = preferred_terms_df.to_dict()["name"]
 
         synonyms_df = description_df[
-            description_df["typeId"] == Snomed.SYNONYM_TERM_ID
+            description_df["typeId"] == SnomedLookup.SYNONYM_TERM_ID
         ].copy()
         synonyms_df.drop(columns=["typeId"], inplace=True)
         acronyms_df = pd.DataFrame(
-            synonyms_df.apply(Snomed._extract_acronym, axis=1)
+            synonyms_df.apply(SnomedLookup._extract_acronym, axis=1)
             .dropna()
             .reset_index(drop=True)
             .tolist()
         )
         acronyms_df.drop_duplicates(inplace=True)
         synonyms_df = pd.concat([synonyms_df, acronyms_df])
-        synonyms_df["name"] = synonyms_df["name"].str.lower()
         synonyms_df = synonyms_df.drop_duplicates()
         synonyms_df = (
             synonyms_df.groupby("cui")["name"].apply(set).reset_index().set_index("cui")
@@ -157,16 +140,16 @@ class Snomed:
         drug_ext_relations_filepath: Path,
         active_cuis: Set[int],
     ) -> Dict[int, Set[int]]:
-        int_relations_df = Snomed._parse_snomed_file(int_relations_filepath)
-        uk_relations_df = Snomed._parse_snomed_file(uk_ext_relations_filepath)
-        drug_relations_df = Snomed._parse_snomed_file(drug_ext_relations_filepath)
+        int_relations_df = SnomedLookup._parse_snomed_file(int_relations_filepath)
+        uk_relations_df = SnomedLookup._parse_snomed_file(uk_ext_relations_filepath)
+        drug_relations_df = SnomedLookup._parse_snomed_file(drug_ext_relations_filepath)
 
         relations_df = pd.concat(
             [int_relations_df, uk_relations_df, drug_relations_df], ignore_index=True
         )
         relations_df = relations_df[relations_df.active == "1"].copy()
         relations_df = relations_df[
-            relations_df.typeId == Snomed.IS_A_RELATIONSHIP_ID
+            relations_df.typeId == SnomedLookup.IS_A_RELATIONSHIP_ID
         ].copy()
         relations_df = relations_df.drop_duplicates()
         relations_df.rename(
@@ -197,13 +180,13 @@ class Snomed:
         int_relations_fpath: Path,
         uk_ext_relations_fpath: Path,
         uk_drug_ext_relations_fpath: Path,
-    ) -> "Snomed":
-        active_cuis = Snomed._load_active_cuis_from_file(
+    ) -> "SnomedLookup":
+        active_cuis = SnomedLookup._load_active_cuis_from_file(
             int_concepts_fpath, uk_ext_concepts_fpath, uk_drug_ext_concepts_fpath
         )
 
         preferred_terms_df, synonyms_df = (
-            Snomed._load_preferred_and_synonym_dfs_from_file(
+            SnomedLookup._load_preferred_and_synonym_dfs_from_file(
                 int_descriptions_fpath,
                 uk_ext_descriptions_fpath,
                 uk_drug_ext_descriptions_fpath,
@@ -211,13 +194,13 @@ class Snomed:
             )
         )
 
-        parent_to_child_df = Snomed._relation_file_parent_to_child_cui_dict(
+        parent_to_child_df = SnomedLookup._relation_file_parent_to_child_cui_dict(
             int_relations_fpath,
             uk_ext_relations_fpath,
             uk_drug_ext_relations_fpath,
             active_cuis,
         )
-        return Snomed(preferred_terms_df, synonyms_df, parent_to_child_df)
+        return SnomedLookup(preferred_terms_df, synonyms_df, parent_to_child_df)
 
     def save(self, dir_name: Path):
         dir_name.mkdir(parents=True, exist_ok=True)
@@ -263,4 +246,6 @@ class Snomed:
             for parent_cui, child_cuis in parent_cui_to_child_json.items()
         }
 
-        return Snomed(cui_to_preferred_term, cui_to_synonyms, parent_cui_to_child_cuis)
+        return SnomedLookup(
+            cui_to_preferred_term, cui_to_synonyms, parent_cui_to_child_cuis
+        )
