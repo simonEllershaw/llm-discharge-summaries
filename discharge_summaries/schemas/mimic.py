@@ -45,7 +45,7 @@ class ProblemSection(BaseModel):
 
 
 class BHC(BaseModel):
-    hadm_id: str
+    hadm_id: int
     full_text: str
     assessment_and_plan: str
     problem_sections: List[ProblemSection]
