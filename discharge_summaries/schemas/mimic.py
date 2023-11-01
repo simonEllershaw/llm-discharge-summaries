@@ -37,3 +37,15 @@ class Record(BaseModel):
     discharge_summary: DischargeSummary
     hadm_id: int
     subject_id: int
+
+
+class ProblemSection(BaseModel):
+    heading: str
+    text: str
+
+
+class BHC(BaseModel):
+    hadm_id: str
+    full_text: str
+    assessment_and_plan: str
+    problem_sections: List[ProblemSection]
