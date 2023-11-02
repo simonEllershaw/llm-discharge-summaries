@@ -36,7 +36,7 @@ class SnomedPhraseMatcher:
         cui_to_synonyms[parent_cui] = snomed_lookup.cui_to_synonyms[parent_cui]
 
         for child_cui in snomed_lookup.get_child_cuis(parent_cui):
-            child_synonyms = snomed_lookup.cui_to_synonyms[parent_cui]
+            child_synonyms = snomed_lookup.cui_to_synonyms[child_cui]
             if self._use_child_cui_label:
                 cui_to_synonyms[child_cui] = child_synonyms
             else:
@@ -49,19 +49,18 @@ class SnomedPhraseMatcher:
         for cui, synonyms_lower in cui_to_synonyms.items():
             self._phrase_matcher.add(str(cui), list(self._nlp.pipe(synonyms_lower)))
 
-    def _get_cuis_in_doc(self, doc: Doc) -> List[int]:
+    def _get_spans_in_doc(self, doc: Doc) -> List[Span]:
         snomed_matches = self._phrase_matcher(doc, as_spans=True)
         filtered_snomed_matches = _filter_out_subspans(snomed_matches)
-        snomed_cuis = [int(span.label_) for span in filtered_snomed_matches]
         # Catch edge cases such as anxiety/depression
-        if not snomed_cuis and "/" in doc.text:
+        if not filtered_snomed_matches and "/" in doc.text:
             return self(doc.text.replace("/", " "))
-        return snomed_cuis
+        return filtered_snomed_matches
 
-    def __call__(self, text: str) -> List[int]:
+    def __call__(self, text: str) -> List[Span]:
         doc = self._nlp(text.lower())
-        return self._get_cuis_in_doc(doc)
+        return self._get_spans_in_doc(doc)
 
-    def pipe(self, texts: List[str]) -> List[List[int]]:
+    def pipe(self, texts: List[str]) -> List[List[Span]]:
         docs = self._nlp.pipe([text.lower() for text in texts])
-        return [self._get_cuis_in_doc(doc) for doc in docs]
+        return [self._get_spans_in_doc(doc) for doc in docs]
