@@ -1,24 +1,18 @@
-from typing import List
+from typing import Iterable, List
 
 from spacy.language import Language
 from spacy.matcher import PhraseMatcher
-from spacy.tokens import Doc, Span
+from spacy.tokens import Doc
+from spacy.util import filter_spans
 
 from .lookup import SnomedLookup
 
 
-def _is_sub_span(sub_span: Span, span: Span) -> bool:
-    return span.start <= sub_span.start and span.end >= sub_span.end
-
-
-def _filter_out_subspans(spans: List[Span]) -> List[Span]:
-    sorted_spans = sorted(spans, key=len, reverse=True)
-    full_spans: List[Span] = list()
-    for span in sorted_spans:
-        # Check if the span overlaps with any previously confirmed full spans
-        if all(not _is_sub_span(span, full_span) for full_span in full_spans):
-            full_spans.append(span)
-    return sorted(full_spans, key=lambda span: span.start)
+@Language.component("lower_case_lemmas")
+def lower_case_lemmas(doc: Doc) -> Doc:
+    for token in doc:
+        token.lemma_ = token.lemma_.lower()
+    return doc
 
 
 class SnomedPhraseMatcher:
@@ -41,26 +35,28 @@ class SnomedPhraseMatcher:
                 cui_to_synonyms[child_cui] = child_synonyms
             else:
                 cui_to_synonyms[parent_cui].union(child_synonyms)
-        cui_to_synonyms = {
-            cui: {synonym.lower() for synonym in synonyms}
-            for cui, synonyms in cui_to_synonyms.items()
-        }
 
-        for cui, synonyms_lower in cui_to_synonyms.items():
-            self._phrase_matcher.add(str(cui), list(self._nlp.pipe(synonyms_lower)))
+        for cui, synonyms in cui_to_synonyms.items():
+            self._phrase_matcher.add(str(cui), list(self._nlp.pipe(synonyms)))
 
-    def _get_spans_in_doc(self, doc: Doc) -> List[Span]:
+    def add_non_snomed_term(self, custom_cui: int, term: str):
+        self._phrase_matcher.add(str(custom_cui), [self._nlp(term)])
+
+    def _annotate_doc(self, doc: Doc) -> Doc:
         snomed_matches = self._phrase_matcher(doc, as_spans=True)
-        filtered_snomed_matches = _filter_out_subspans(snomed_matches)
+        # When spans overlap, the (first) longest span is preferred
+        filtered_snomed_matches = filter_spans(snomed_matches)
         # Catch edge cases such as anxiety/depression
         if not filtered_snomed_matches and "/" in doc.text:
             return self(doc.text.replace("/", " "))
-        return filtered_snomed_matches
+        doc.set_ents(filtered_snomed_matches)
+        return doc
 
-    def __call__(self, text: str) -> List[Span]:
-        doc = self._nlp(text.lower())
-        return self._get_spans_in_doc(doc)
+    def __call__(self, text: str) -> Doc:
+        doc = self._nlp(text)
+        self._annotate_doc(doc)
+        return doc
 
-    def pipe(self, texts: List[str]) -> List[List[Span]]:
-        docs = self._nlp.pipe([text.lower() for text in texts])
-        return [self._get_spans_in_doc(doc) for doc in docs]
+    def pipe(self, texts: Iterable[str]) -> List[Doc]:
+        docs = self._nlp.pipe([text for text in texts])
+        return [self._annotate_doc(doc) for doc in docs]
