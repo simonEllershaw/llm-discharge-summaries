@@ -5,6 +5,7 @@ models/*
 */output/*
 !data/developer_nhs_uk_gt.json
 !data/prsb_example_gt.json
+*.txt
 
 .DS_Store
 # Byte-compiled / optimized / DLL files
