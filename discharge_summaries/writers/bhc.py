@@ -25,16 +25,14 @@ class BHCWriter:
         self._logging_dir.mkdir(exist_ok=True)
         self._message_delimiter = "\n" + ("*" * 80) + "\n"
 
-    def _create_reason_for_admission_prompts(
-        self, physician_notes: List[PhysicianNote]
-    ) -> List[Message]:
-        example_admission_paragraphs = "\n\n".join(
-            bhc.assessment_and_plan for bhc in self._example_bhcs
-        )
-        return [
-            Message(
-                role=Role.SYSTEM,
-                content=f"""You are a consultant doctor completing a medical discharge summary.
+    def _generate_reason_for_admission(
+        self, physician_notes: List[PhysicianNote], logging=True
+    ) -> str:
+        examples = "\n\n".join(bhc.assessment_and_plan for bhc in self._example_bhcs)
+
+        system_message = Message(
+            role=Role.SYSTEM,
+            content=f"""You are a consultant doctor completing a medical discharge summary.
 Your task is to write the first paragraph of the summary.
 The paragraph should be 30 words long.
 The paragraph must include the patient's:
@@ -45,20 +43,32 @@ The paragraph must include the patient's:
 This information can be found in the admission note provided by the user.
 
 The following are examples of first paragraphs:
-{example_admission_paragraphs}""",
-            ),
-            Message(
-                role=Role.USER,
-                content=f"""Admission Note
+{examples}""",
+        )
+
+        user_message = Message(
+            role=Role.USER,
+            content=f"""Admission Note
 {physician_notes[0].text}
 Please write the first paragraph of the discharge summary using the admission note and the requirements given in the system message.
 """,  # noqa
-            ),
-        ]
+        )
 
-    def _create_finding_prompts(
-        self, physician_notes: List[PhysicianNote]
-    ) -> List[Message]:
+        assistant_message = self._llm.query([system_message, user_message])
+        if logging:
+            (self._logging_dir / "reason_for_admission.txt").write_text(
+                self._message_delimiter.join(
+                    [
+                        message.content
+                        for message in (system_message, user_message, assistant_message)
+                    ]
+                )
+            )
+        return assistant_message.content
+
+    def _generate_findings(
+        self, physician_notes: List[PhysicianNote], logging=True
+    ) -> Set[str]:
         examples = "\n\n".join(
             "\n".join(
                 para.heading
@@ -67,26 +77,45 @@ Please write the first paragraph of the discharge summary using the admission no
             )
             for bhc in self._example_bhcs
         )
-        return [
-            Message(
-                role=Role.SYSTEM,
-                content=f"""You are a consultant doctor completing a medical discharge summary.
+        system_message = Message(
+            role=Role.SYSTEM,
+            content=f"""You are a consultant doctor completing a medical discharge summary.
 Your task is to list the main clinical findings made during the patient's stay.
 Each finding should be on a new line.
+Only include previous medical conditions if they were actively managed during the patient's stay.
 Use Snomed CT preferred terms.
 This information can be found in the physician note provided by the user.
 
 The following are examples of previous patient's clinical findings:
 {examples}""",
-            ),
-            Message(
-                role=Role.USER,
-                content=f"""Physician Note
+        )
+        user_message = Message(
+            role=Role.USER,
+            content=f"""Physician Note
 {physician_notes[-1].text}
 Please write the list main clinical findings in the physician note.
 """,
-            ),
-        ]
+        )
+        assistant_message = self._llm.query([system_message, user_message])
+        if logging:
+            (self._logging_dir / "reason_for_admission.txt").write_text(
+                self._message_delimiter.join(
+                    [
+                        message.content
+                        for message in (system_message, user_message, assistant_message)
+                    ]
+                )
+            )
+
+        filtered_findings: Set[str] = set()
+        for finding in assistant_message.content.split("\n"):
+            if all(
+                finding.lower() not in filtered_finding.lower()
+                for filtered_finding in filtered_findings
+            ):
+                filtered_findings.add(finding)
+
+        return filtered_findings
 
     @staticmethod
     def _extract_spans_to_text(extract_spans: List[Span], timestamps: List[str]) -> str:
@@ -98,16 +127,15 @@ Please write the list main clinical findings in the physician note.
             )
         return "\n\n".join(extract_texts)
 
-    def _create_problem_paragraph_prompt(
-        self, finding: str, extract_text: str
-    ) -> List[Message]:
+    def _generate_problem_section(
+        self, finding: str, extract_text: str, logging=True
+    ) -> ProblemSection:
         examples = "\n\n".join(
             bhc.problem_sections[0].text for bhc in self._example_bhcs
         )
-        return [
-            Message(
-                role=Role.SYSTEM,
-                content=f"""You are a consultant doctor completing a medical discharge summary.
+        system_message = Message(
+            role=Role.SYSTEM,
+            content=f"""You are a consultant doctor completing a medical discharge summary.
 The summary is made up of multiple paragraphs focusing on different clinical findings.
 Your task is to write one of these paragraphs.
 
@@ -134,78 +162,54 @@ Do not include the patients past medical history unless relevant to this finding
 The following are examples of clinical finding paragraphs:
 
 {examples}""",
-            ),
-            Message(
-                role=Role.USER,
-                content=f"""Clinical Finding: {finding}
+        )
+        user_message = Message(
+            role=Role.USER,
+            content=f"""Clinical Finding: {finding}
 Extracts:
 {extract_text}
 Please write the paragraph of the discharge summary describing this clinical finding in accordance to the requirements given in the system message.
 """,  # noqa
-            ),
-        ]
+        )
+
+        assistant_message = self._llm.query([system_message, user_message])
+        if logging:
+            (self._logging_dir / "reason_for_admission.txt").write_text(
+                self._message_delimiter.join(
+                    [
+                        message.content
+                        for message in (system_message, user_message, assistant_message)
+                    ]
+                )
+            )
+        return ProblemSection(heading=finding, text=assistant_message.content)
 
     def __call__(self, physician_notes: List[PhysicianNote], logging=True) -> BHC:
         if len({note.hadm_id for note in physician_notes}) != 1:
             raise ValueError("All physician notes must be for the same hadm_id")
 
-        reason_for_admission_prompts = self._create_reason_for_admission_prompts(
-            physician_notes
+        reason_for_admission = self._generate_reason_for_admission(
+            physician_notes, logging=True
         )
-        reason_for_admission_response = self._llm.query(reason_for_admission_prompts)
-        if logging:
-            (self._logging_dir / "reason_for_admission.txt").write_text(
-                self._message_delimiter.join(
-                    [message.content for message in reason_for_admission_prompts]
-                    + [reason_for_admission_response.content]
-                )
-            )
 
-        finding_prompts = self._create_finding_prompts(physician_notes)
-        findings_response = self._llm.query(finding_prompts)
-        if logging:
-            (self._logging_dir / "findings.txt").write_text(
-                self._message_delimiter.join(
-                    [message.content for message in finding_prompts]
-                    + [findings_response.content]
-                )
-            )
-
-        filtered_findings: Set[str] = set()
-        for finding in findings_response.content.split("\n"):
-            if all(
-                finding.lower() not in filtered_finding.lower()
-                for filtered_finding in filtered_findings
-            ):
-                filtered_findings.add(finding)
+        findings = self._generate_findings(physician_notes, logging=True)
 
         finding_to_extract_spans = self._snomed_retriever(
-            [note.text for note in physician_notes], filtered_findings
+            [note.text for note in physician_notes], findings
         )
         timestamps = [note.timestamp for note in physician_notes]
         finding_to_extract_text = {
             finding: self._extract_spans_to_text(extract_spans, timestamps)
             for finding, extract_spans in finding_to_extract_spans.items()
         }
-        problem_sections = []
-        for finding, extract_text in finding_to_extract_text.items():
-            problem_paragraph_prompts = self._create_problem_paragraph_prompt(
-                finding, extract_text
-            )
-            problem_paragraph_response = self._llm.query(problem_paragraph_prompts)
-            problem_sections.append(
-                ProblemSection(heading=finding, text=problem_paragraph_response.content)
-            )
-            if logging:
-                (self._logging_dir / f"problem_{finding}.txt").write_text(
-                    self._message_delimiter.join(
-                        [message.content for message in problem_paragraph_prompts]
-                        + [problem_paragraph_response.content]
-                    )
-                )
+
+        problem_sections = [
+            self._generate_problem_section(finding, extract_text, logging=True)
+            for finding, extract_text in finding_to_extract_text.items()
+        ]
 
         full_text = "\n\n".join(
-            [reason_for_admission_response.content]
+            [reason_for_admission]
             + [
                 f"{problem_section.heading}: {problem_section.text}"
                 for problem_section in problem_sections
@@ -215,6 +219,6 @@ Please write the paragraph of the discharge summary describing this clinical fin
         return BHC(
             hadm_id=physician_notes[0].hadm_id,
             full_text=full_text,
-            assessment_and_plan=reason_for_admission_response.content,
+            assessment_and_plan=reason_for_admission,
             problem_sections=problem_sections,
         )
