@@ -43,9 +43,18 @@ class ProblemSection(BaseModel):
     heading: str
     text: str
 
+    class Config:
+        frozen = True
+
 
 class BHC(BaseModel):
     hadm_id: int
-    full_text: str
     assessment_and_plan: str
     problem_sections: List[ProblemSection]
+    full_text: str
+
+
+class PhysicianNote(BaseModel):
+    hadm_id: int
+    timestamp: str
+    text: str
