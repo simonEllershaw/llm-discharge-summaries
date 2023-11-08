@@ -44,11 +44,12 @@ class SnomedPhraseMatcher:
 
     def _annotate_doc(self, doc: Doc) -> Doc:
         snomed_matches = self._phrase_matcher(doc, as_spans=True)
+        # Catch edge cases such as anxiety/depression
+        if not snomed_matches and "/" in doc.text:
+            doc_v2 = self._nlp(doc.text.replace("/", " "))
+            snomed_matches = self._phrase_matcher(doc_v2, as_spans=True)
         # When spans overlap, the (first) longest span is preferred
         filtered_snomed_matches = filter_spans(snomed_matches)
-        # Catch edge cases such as anxiety/depression
-        if not filtered_snomed_matches and "/" in doc.text:
-            return self(doc.text.replace("/", " "))
         doc.set_ents(filtered_snomed_matches)
         return doc
 
