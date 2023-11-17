@@ -17,7 +17,7 @@ class PatientDemographics(BaseModel):
 
 
 class SocialContext(BaseModel):
-    social_context: str = Field(
+    social_context: List[str] = Field(
         description=(
             "Includes elements such as lifestyle factors eg smoking status, alcohol,"
             " and social context, eg whether the person lives alone. This is"
@@ -32,14 +32,17 @@ class SocialContext(BaseModel):
 class AdmissionDetails(BaseModel):
     reason_for_admission: str = Field(
         description=(
+            # Additional
             "The main reason why the patient was admitted to hospital, eg chest pain,"
-            " breathlessness, collapse, etc."
+            " breathlessness, collapse, etc. This should be symptoms and not the"
+            " diagnosis."
         )
     )
     admission_method: str = Field(
-        description="May be autopopulated, eg elective/emergency"
+        # Amended
+        description="Eg elective/emergency"
     )
-    relevant_past_medical_and_mental_health_history: str = Field(
+    relevant_past_medical_and_mental_health_history: List[str] = Field(
         description=(
             "Whilst the GP is likely to hold this information it is useful for"
             " documents to stand-alone and provides an insight into the basis for"
@@ -50,21 +53,24 @@ class AdmissionDetails(BaseModel):
 
 
 class Diagnoses(BaseModel):
-    """List brief factual information"""
+    # Additional
+    """Record of the diagnoses relevant to the admission. Do not include diagnoses from past medical history."""
 
     primary_diagnosis: str = Field(
         description=(
-            "Confirmed primary diagnosis (or symptoms); active dianosis being treated."
+            "Confirmed primary diagnosis (or symptoms); active diagnosis being treated."
             " Record to highest level of certainty, eg do not record a diagnosis if it"
             " is not certain, record a symptom instead."
         )
     )
     secondary_diagnoses: List[str] = Field(
         description=(
+            # Amended
             "Record any other diagnoses relevant to admission, such as: other"
             " conditions which impact on the treatment eg dementia, diabetes, COPD; "
             " complications during admission eg venous thromboembolism, hospital"
-            " acquired pneumonia; or incidental new diagnoses."
+            " acquired pneumonia; or incidental new diagnoses. Only include previous"
+            " diagnoses if they have been actively treated during the hospital stay."
         )
     )
 
@@ -85,13 +91,14 @@ class ClinicalSummary(BaseModel):
     )
     investigation_results: List[str] = Field(
         description=(
+            # Amended
             "It is important to include results of investigations which the GP is"
             " likely to monitor either of the health condition or associated with"
             " medication use eg renal function in patients with diabetes or prescribed"
             " an ACE inhibitor. This is also an opportunity to provide more detail on"
             " medical problems not related to the main admission eg current lung"
             " function tests in patient with COPD admission for elective procedure;"
-            " cardiac echogram, etc"
+            " cardiac echogram, chest x-ray, mri scan, etc."
         )
     )
 
@@ -105,19 +112,22 @@ class DischargeDetailsAndPlan(BaseModel):
 
 
 class PlanAndRequestedActions(BaseModel):
-    plan_and_requested_actions: str = Field(
+    # Altered
+    post_discharge_plan_and_requested_actions: List[str] = Field(
         description=(
-            "Make clear where the responsibility for actions lies (eg with the GP"
-            " practice or hospital). eg Health or test monitoring, specialist services"
-            " eg Macmillan, Diabetes, Optometry"
+            "List detailing the hospital post-discharge management plan what is"
+            " expected of the GP following the patient's discharge. Make clear where"
+            " the responsibility for actions lies (eg with the GP practice or"
+            " hospital). eg Health or test monitoring, specialist services eg"
+            " Macmillan, Diabetes, Optometry"
         )
     )
-    information_and_advice_given: str = Field(
+    information_and_advice_given: List[str] = Field(
         description=(
             "Note of information and advice given and patient/carer comprehension"
         )
     )
-    patient_and_carer_concerns_expectations_and_wishes: str = Field(
+    patient_and_carer_concerns_expectations_and_wishes: List[str] = Field(
         description=(
             "Description of the concerns, wishes or goals of the person in relation to"
             " their care, as expressed by the person, their representative or carer."
@@ -127,8 +137,10 @@ class PlanAndRequestedActions(BaseModel):
     )
     next_appointment_details: str = Field(
         description=(
-            "Follow-up appointment booked, eg outpatient department - include contact"
-            " details."
+            # Amended
+            "Details of booked follow-up appointment. State who the appointment is with"
+            " booked eg outpatient department. Note date and contact details if"
+            " available."
         )
     )
 
