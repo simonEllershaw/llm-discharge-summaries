@@ -80,7 +80,7 @@ Clinical notes are ordered by ascending timestamp.
 The discharge summary must be written in accordance with the following json schema.
 {json.dumps(json_schema)}
 All fields are required. However, if the relevant information is not present in the clinical notes, fields can be filled with an empty string or list.
-Do not use acronyms or abbreviations used.
+Expand all acronyms to their full terms.
 
 An example of a valid discharge summary is provided below.
 {json.dumps(example_summary)}""",  # noqa
