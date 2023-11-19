@@ -98,7 +98,8 @@ class ClinicalSummary(BaseModel):
             " an ACE inhibitor. This is also an opportunity to provide more detail on"
             " medical problems not related to the main admission eg current lung"
             " function tests in patient with COPD admission for elective procedure;"
-            " cardiac echogram, chest x-ray, mri scan, etc."
+            " cardiac echogram, chest x-ray, mri scan, etc. Each investigation is a"
+            " separate element in the list."
         )
     )
 
