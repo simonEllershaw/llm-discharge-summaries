@@ -13,16 +13,19 @@ class SnomedRetriever:
         snomed_phrase_matcher: SnomedPhraseMatcher,
         snomed_lookup: SnomedLookup,
         token_window_size: int = 50,
+        sentence_window_size: int = 2,
     ) -> None:
         self._snomed_phrase_matcher = snomed_phrase_matcher
         self._snomed_lookup = snomed_lookup
         self._token_window_size = token_window_size
+        self._sentence_window_size = sentence_window_size
 
     def _get_cui_to_search_terms(self, search_terms: Set[str], include_child_cuis=True):
         search_cuis = [
-            [int(ent.label_) for ent in finding_doc.ents]
-            for finding_doc in self._snomed_phrase_matcher.pipe(search_terms)
+            [int(ent.label_) for ent in search_term_doc.ents]
+            for search_term_doc in self._snomed_phrase_matcher.pipe(search_terms)
         ]
+
         search_term_to_cuis = {
             term: cuis for term, cuis in zip(search_terms, search_cuis)
         }
@@ -71,15 +74,34 @@ class SnomedRetriever:
         search_term_to_extract_spans = defaultdict(list)
         for idx, doc in enumerate(self._snomed_phrase_matcher.pipe(texts)):
             doc.user_data = {"idx": idx}
-            for ent in doc.ents:
-                for ent_search_term in cui_to_search_terms.get(int(ent.label_), set()):
-                    search_term_to_extract_spans[ent_search_term].append(
-                        Span(
-                            doc,
-                            max(0, ent.start - self._token_window_size),
-                            min(ent.end + self._token_window_size, len(ent.doc)),
+            doc_sents = list(doc.sents)
+            for sent_idx, sent in enumerate(doc_sents):
+                for ent in sent.ents:
+                    for ent_search_term in cui_to_search_terms.get(
+                        int(ent.label_), set()
+                    ):
+                        extract_start = doc_sents[
+                            max(0, sent_idx - self._sentence_window_size)
+                        ].start
+                        extract_end = doc_sents[
+                            min(
+                                len(doc_sents) - 1,
+                                sent_idx + self._sentence_window_size,
+                            )
+                        ].end
+                        if extract_end - extract_start > self._token_window_size * 2:
+                            extract_start = max(0, ent.start - self._token_window_size)
+                            extract_end = min(
+                                ent.end + self._token_window_size, len(ent.doc)
+                            )
+
+                        search_term_to_extract_spans[ent_search_term].append(
+                            Span(
+                                doc,
+                                extract_start,
+                                extract_end,
+                            )
                         )
-                    )
 
         search_term_to_filtered_extract_spans = {
             search_term: self._filter_repeated_span_texts(

@@ -98,7 +98,7 @@ Please write the list main clinical findings in the physician note.
         )
         assistant_message = self._llm.query([system_message, user_message])
         if logging:
-            (self._logging_dir / "reason_for_admission.txt").write_text(
+            (self._logging_dir / "findings.txt").write_text(
                 self._message_delimiter.join(
                     [
                         message.content
@@ -136,7 +136,7 @@ Please write the list main clinical findings in the physician note.
         system_message = Message(
             role=Role.SYSTEM,
             content=f"""You are a consultant doctor completing a medical discharge summary.
-The summary is made up of multiple paragraphs focusing on different clinical findings.
+The summary is made up of multiple paragraphs describing the care provided for different clinical findings.
 Your task is to write one of these paragraphs.
 
 The user will provide a clinical finding and a list of extracts from the physician note related
@@ -149,15 +149,15 @@ Physician Note [Document number], [Timestamp]: [Extract n]
 These notes are ordered by time.
 Only information contained in these notes may be used to write the paragraph.
 
-Your paragraph should include the following information about the finding:
-- Symptom caused by the finding
-- Investigations and tests performed to diagnose the finding
-- Medication prescribed for the finding
+Your paragraph should be brief and may include the following information (if contained in the extracts):
+- Investigations or tests performed to diagnose or monitor the finding
+- Medications prescribed or altered due to the finding
 - Procedures performed to treat the finding
-- Future treatment plan to manage the finding
-The paragraph should be 50 words long.
+- Communication with the patient or their family about the finding
+- Plans to manage the finding after discharge
+Only include information that is helpful to future healthcare professionals.
 Do not include other clinical findings or diagnoses in the paragraph.
-Do not include the patients past medical history unless relevant to this finding.
+Do not include the patients past medical history.
 
 The following are examples of clinical finding paragraphs:
 
@@ -174,7 +174,7 @@ Please write the paragraph of the discharge summary describing this clinical fin
 
         assistant_message = self._llm.query([system_message, user_message])
         if logging:
-            (self._logging_dir / "reason_for_admission.txt").write_text(
+            (self._logging_dir / f"finding_{finding}.txt").write_text(
                 self._message_delimiter.join(
                     [
                         message.content
@@ -193,6 +193,9 @@ Please write the paragraph of the discharge summary describing this clinical fin
         )
 
         findings = self._generate_findings(physician_notes, logging=True)
+        # findings = findings.union({"Prophylaxis", "FEN", "Code", "Communication"})
+        # reason_for_admission = ""
+        # findings = {"Sepsis"}
 
         finding_to_extract_spans = self._snomed_retriever(
             [note.text for note in physician_notes], findings
@@ -201,6 +204,7 @@ Please write the paragraph of the discharge summary describing this clinical fin
         finding_to_extract_text = {
             finding: self._extract_spans_to_text(extract_spans, timestamps)
             for finding, extract_spans in finding_to_extract_spans.items()
+            if extract_spans
         }
 
         problem_sections = [
