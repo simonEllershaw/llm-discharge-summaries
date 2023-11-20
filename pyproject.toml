@@ -34,9 +34,8 @@ pypdf2 = "^3.0.1"
 unidecode = "^1.3.6"
 jsonref = "^1.1.0"
 rank-bm25 = "^0.2.2"
-scispacy = "^0.5.3"
-en_core_sci_lg = { url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.3/en_core_sci_lg-0.5.3.tar.gz" }
 rouge-score = "^0.1.2"
+medcat = "~1.5"
 
 
 [build-system]
