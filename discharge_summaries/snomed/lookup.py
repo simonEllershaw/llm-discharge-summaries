@@ -11,7 +11,7 @@ class SnomedLookup:
     SYNONYM_TERM_ID = "900000000000013009"
     IS_A_RELATIONSHIP_ID = "116680003"
 
-    ACRONYM_REGEX = re.compile(r"^[A-Z]{2,4}(?= - )")
+    ACRONYM_REGEX = re.compile(r"^[A-Z1-9]{2,}(?= - )")
 
     def __init__(
         self,
