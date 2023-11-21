@@ -56,5 +56,6 @@ class BHC(BaseModel):
 
 class PhysicianNote(BaseModel):
     hadm_id: int
+    title: str
     timestamp: str
     text: str

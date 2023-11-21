@@ -36,6 +36,7 @@ jsonref = "^1.1.0"
 rank-bm25 = "^0.2.2"
 rouge-score = "^0.1.2"
 medcat = "~1.5"
+python-docx = "^1.1.0"
 
 
 [build-system]

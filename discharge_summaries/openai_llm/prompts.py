@@ -74,7 +74,7 @@ def generate_rcp_system_message(json_schema: Dict, example_summary: Dict) -> Mes
         role=Role.SYSTEM,
         content=f"""You are a consultant doctor tasked with writing a patients discharge summary.
 Only the information in the clinical notes provided by the user can be used for this task.
-Each clinical note has a title of the format Physician Note [number]: [timestamp year-month-day hour:min].
+Each clinical note has a title of the format [Title]: [timestamp year-month-day hour:min].
 Clinical notes are ordered by ascending timestamp.
 
 The discharge summary must be written in accordance with the following json schema.
@@ -89,8 +89,7 @@ An example of a valid discharge summary is provided below.
 
 def generate_rcp_user_message(notes: List[PhysicianNote]) -> Message:
     notes_string = "\n\n".join(
-        f"Clinical Note {idx+1}: {note.timestamp}\n{note.text}"
-        for idx, note in enumerate(notes)
+        f"{note.title}: {note.timestamp}\n{note.text}" for note in notes
     )
     return Message(
         role=Role.USER,
