@@ -2,8 +2,14 @@ from typing import List
 
 from pydantic import BaseModel, Field
 
+AUTOPOPULATED = "Autopopulated"
+
 
 class PatientDemographics(BaseModel):
+    patient_name: str = AUTOPOPULATED
+    date_of_birth: str = AUTOPOPULATED
+    patient_address: str = AUTOPOPULATED
+    nhs_number: str = AUTOPOPULATED
     safety_alerts: List[str] = Field(
         description=(
             "Any alerts could be documented here eg treatment limitation decisions,"
@@ -14,6 +20,16 @@ class PatientDemographics(BaseModel):
             " member)."
         )
     )
+
+
+class GP_Practice(BaseModel):
+    GP_name: str = Field(
+        description=(
+            "Name of a patient's general practitioner, if offered by the patient or"
+            " their representative."
+        )
+    )
+    GP_practice_details = AUTOPOPULATED
 
 
 class SocialContext(BaseModel):
@@ -38,6 +54,7 @@ class AdmissionDetails(BaseModel):
             " diagnosis."
         )
     )
+    date_time_of_admission: str = AUTOPOPULATED
     admission_method: str = Field(
         # Amended
         description="Eg elective/emergency"
@@ -105,6 +122,7 @@ class ClinicalSummary(BaseModel):
 
 
 class DischargeDetailsAndPlan(BaseModel):
+    date_time_of_discharge: str = AUTOPOPULATED
     discharge_destination: str = Field(
         "Highlight when different to patient's usual address and if permanent or"
         " interim arrangement eg residential care, rehabilitation facility, local"
@@ -146,6 +164,61 @@ class PlanAndRequestedActions(BaseModel):
     )
 
 
+class Medication(BaseModel):
+    medication_name: str = Field(description="May be generic name or brand name")
+    # Added field. Status definitions from PRSB guidelines
+    status: str = Field(
+        description=(
+            "The nature of any change made to the medication since admission. Continued"
+            " [Medicine present on both admission and discharge with no amendments.]."
+            " Added [Medicine present on discharge but not on admission]. Amended"
+            " [Medicine present on both admission and discharge but with amendment(s)"
+            " since admission.]. Discontinued [The medication is no longer to be taken"
+            " by the patient]"
+        )
+    )
+    form: str = Field(
+        description="Form of the medicinal substance eg capsules, tablets, liquid"
+    )
+    route: str = Field(
+        description=(
+            "Medication administration description (eg oral, intravenous, etc). May"
+            " include method (eg inhaler)."
+        )
+    )
+    dose_directions_description: str = Field(
+        description=(
+            "Recommendation of time period for which the medication should be"
+            " continued. 'Continue indefinitely'; 'Do not discontinue' (never"
+            " discontinue); 'Stop when course complete'."
+        )
+    )
+    dose_duration_description: str = Field(
+        description=(
+            "Description of the entire medication dosage and administration directions,"
+            " including dose quantity and medication frequency, eg '1 tablet at night'"
+            " or '20mg at 10pm'"
+        )
+    )
+    indication: str = Field(description="Reason for medication being prescribed.")
+    description_of_any_amendment: str = Field(
+        description="Description of any amendment, where relevant"
+    )
+    additional_information_patient_advice: str = Field(
+        description=(
+            "May include guidance to prescriber, patient or person administering the"
+            " medication eg rinse mouth with water after use"
+        )
+    )
+    quantity_supplied: str = Field(
+        description=(
+            "The quantity of the medication (eg tablets, inhalers, etc.) provided to"
+            " the patient on discharge. This may be dispensed by the pharmacy or on the"
+            " ward. Or 'Patient's own medication'."
+        )
+    )
+
+
 class AllergiesAndAdverseReaction(BaseModel):
     causative_agent: str = Field(
         description=(
@@ -167,11 +240,12 @@ class RCPGuidelines(BaseModel):
     """
 
     patient_demographics: PatientDemographics
-    # GP practice not included in example so not included here
+    GP_practice: GP_Practice
     social_context: SocialContext
     admission_details: AdmissionDetails
     diagnoses: Diagnoses
     clinical_summary: ClinicalSummary
     discharge_details: DischargeDetailsAndPlan
+    # medications: List[Medication]
     plan_and_requested_actions: PlanAndRequestedActions
     allergies_and_adverse_reaction: List[AllergiesAndAdverseReaction]
