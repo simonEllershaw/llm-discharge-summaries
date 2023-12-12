@@ -39,17 +39,18 @@ class AzureOpenAIChatModel(ChatModel):
         self.timeout = timeout
         self.max_retries = max_retries
 
-    def query(self, messages: List[Message], num_retries=0) -> Message:
+    def query(self, messages: List[Message], num_retries=0, **kwargs) -> Message:
         try:
             response = openai.ChatCompletion.create(
                 engine=self.engine,
                 messages=[message.dict() for message in messages],
                 temperature=self.temperature,
                 timeout=self.timeout,
+                **kwargs
             )
         except TryAgain as e:
             if num_retries < self.max_retries:
-                return self.query(messages, num_retries + 1)
+                return self.query(messages, num_retries + 1, **kwargs)
             else:
                 raise e
         return Message(
