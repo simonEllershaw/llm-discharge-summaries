@@ -70,9 +70,6 @@ class AdmissionDetails(BaseModel):
 
 
 class Diagnoses(BaseModel):
-    # Additional
-    """Record of the diagnoses relevant to the admission. Do not include diagnoses from past medical history."""
-
     primary_diagnosis: str = Field(
         description=(
             "Confirmed primary diagnosis (or symptoms); active diagnosis being treated."
@@ -82,12 +79,12 @@ class Diagnoses(BaseModel):
     )
     secondary_diagnoses: List[str] = Field(
         description=(
-            # Amended
             "Record any other diagnoses relevant to admission, such as: other"
             " conditions which impact on the treatment eg dementia, diabetes, COPD; "
             " complications during admission eg venous thromboembolism, hospital"
-            " acquired pneumonia; or incidental new diagnoses. Only include previous"
-            " diagnoses if they have been actively treated during the hospital stay."
+            " acquired pneumonia; or incidental new diagnoses."
+            # Added
+            " Do not include diagnoses made before this hospital admission."
         )
     )
 
@@ -104,19 +101,22 @@ class ClinicalSummary(BaseModel):
         description=(
             "The details of any therapeutic or diagnostic procedures performed. This"
             " should be the name of the procedure, with additional comments if needed."
+            # Added
+            "Do not include procedures performed before this hospital admission."
         )
     )
     investigation_results: List[str] = Field(
         description=(
-            # Amended
             "It is important to include results of investigations which the GP is"
             " likely to monitor either of the health condition or associated with"
             " medication use eg renal function in patients with diabetes or prescribed"
             " an ACE inhibitor. This is also an opportunity to provide more detail on"
             " medical problems not related to the main admission eg current lung"
-            " function tests in patient with COPD admission for elective procedure;"
-            " cardiac echogram, chest x-ray, mri scan, etc. Each investigation is a"
-            " separate element in the list."
+            " function tests in patient with COPD admission for elective procedure,"
+            " cardiac echogram "
+            # Added
+            ", chest x-ray, mri scan, etc. Each investigation is a separate element in"
+            " the list."
         )
     )
 
@@ -138,7 +138,10 @@ class PlanAndRequestedActions(BaseModel):
             " expected of the GP following the patient's discharge. Make clear where"
             " the responsibility for actions lies (eg with the GP practice or"
             " hospital). eg Health or test monitoring, specialist services eg"
-            " Macmillan, Diabetes, Optometry"
+            " Macmillan, Diabetes, Optometry."
+            # Added
+            " Do not include jobs that are still to be done in hospital before"
+            " discharge."
         )
     )
     information_and_advice_given: List[str] = Field(
@@ -156,10 +159,10 @@ class PlanAndRequestedActions(BaseModel):
     )
     next_appointment_details: str = Field(
         description=(
-            # Amended
             "Details of booked follow-up appointment. State who the appointment is with"
-            " booked eg outpatient department. Note date and contact details if"
-            " available."
+            " booked eg outpatient department."
+            # Added
+            " Note date and contact details if available."
         )
     )
 

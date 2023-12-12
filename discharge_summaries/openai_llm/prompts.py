@@ -82,7 +82,7 @@ The discharge summary must be written in accordance with the following json sche
 All fields are required. However, if the relevant information is not present in the clinical notes, fields can be filled with an empty string or list.
 Expand all acronyms to their full terms.
 
-An example of a valid discharge summary is provided below.
+An example of a valid discharge summary json user response is:
 {json.dumps(example_summary)}""",  # noqa
     )
 
