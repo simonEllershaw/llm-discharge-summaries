@@ -69,32 +69,54 @@ You can either reply with None or an exact string match from the user text.""",
     return [system_message, *few_shot_examples, user_message]
 
 
-def generate_rcp_system_message(json_schema: Dict, example_summary: Dict) -> Message:
+def generate_rcp_system_message(json_schema: Dict) -> Message:
     return Message(
         role=Role.SYSTEM,
         content=f"""You are a consultant doctor tasked with writing a patients discharge summary.
-Only the information in the clinical notes provided by the user can be used for this task.
+A user will provide you with a list of clinical notes from a hospital stay from which you will write a discharge summary.
 Each clinical note has a title of the format [Title]: [timestamp year-month-day hour:min].
 Clinical notes are ordered by ascending timestamp.
+Only the information in the clinical notes provided by the most recent user message can be used for this task.
 
 The discharge summary must be written in accordance with the following json schema.
 {json.dumps(json_schema)}
 All fields are required. However, if the relevant information is not present in the clinical notes, fields can be filled with an empty string or list.
-Expand all acronyms to their full terms.
-
-An example of a valid discharge summary json user response is:
-{json.dumps(example_summary)}""",  # noqa
+Expand all acronyms to their full terms.""",  # noqa,
     )
+
+
+def _deduplicate_physician_notes(notes: List[PhysicianNote]) -> List[PhysicianNote]:
+    seen_lines = set()
+    deduplicated_notes = []
+    for note in notes:
+        deduplicated_lines = []
+        for line in note.text.split("\n"):
+            if line == "" or line in seen_lines:
+                pass
+            else:
+                seen_lines.add(line)
+                deduplicated_lines.append(line)
+        if deduplicated_lines:
+            deduplicated_notes.append(
+                note.copy(update={"text": "\n".join(deduplicated_lines)})
+            )
+    return deduplicated_notes
+
+
+def _physician_notes_to_string(notes: List[PhysicianNote]) -> str:
+    deduplicated_notes = _deduplicate_physician_notes(notes)
+    deduplicated_notes = sorted(deduplicated_notes, key=lambda note: note.timestamp)
+    notes_string = "\n\n".join(
+        f"{note.title}: {note.timestamp}\n{note.text}" for note in deduplicated_notes
+    )
+    return notes_string
 
 
 def generate_rcp_user_message(notes: List[PhysicianNote]) -> Message:
-    notes_string = "\n\n".join(
-        f"{note.title}: {note.timestamp}\n{note.text}" for note in notes
-    )
     return Message(
         role=Role.USER,
-        content=(
-            "Generate a discharge summary json for the following clinical"
-            f" notes.\n\n{notes_string}"
-        ),
+        content=f"""Clinical Notes
+{_physician_notes_to_string(notes)}
+Please write a discharge summary only using the information in this message's clinical notes.
+The discharge summary must be written in accordance with the json schema given in the system message.""",
     )
