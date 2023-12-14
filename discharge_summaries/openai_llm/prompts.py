@@ -80,7 +80,8 @@ Only the information in the clinical notes provided by the most recent user mess
 
 The discharge summary must be written in accordance with the following json schema.
 {json.dumps(json_schema)}
-All fields are required. However, if the relevant information is not present in the clinical notes, fields can be filled with an empty string or list.
+All fields are required.
+If the relevant information is not present in the clinical notes, fields can be filled with an empty string or list.
 Expand all acronyms to their full terms.""",  # noqa,
     )
 

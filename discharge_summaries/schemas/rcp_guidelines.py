@@ -124,9 +124,11 @@ class ClinicalSummary(BaseModel):
 class DischargeDetailsAndPlan(BaseModel):
     date_time_of_discharge: str = AUTOPOPULATED
     discharge_destination: str = Field(
-        "Highlight when different to patient's usual address and if permanent or"
-        " interim arrangement eg residential care, rehabilitation facility, local"
-        " hospital (from tertiary centre)"
+        description=(
+            "Highlight when different to patient's usual address and if permanent or"
+            " interim arrangement eg residential care, rehabilitation facility, local"
+            " hospital (from tertiary centre)"
+        )
     )
 
 
