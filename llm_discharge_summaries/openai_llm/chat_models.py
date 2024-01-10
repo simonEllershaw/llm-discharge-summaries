@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from typing import List
 
 import openai
 from openai.error import TryAgain
@@ -9,11 +8,11 @@ from llm_discharge_summaries.openai_llm.message import Message, Role
 
 class ChatModel:
     @abstractmethod
-    def query(self, messages: List[Message], num_retries=0) -> Message:
+    def query(self, messages: list[Message], num_retries=0) -> Message:
         pass
 
     @abstractmethod
-    async def aquery(self, messages: List[Message], num_retries=0) -> Message:
+    async def aquery(self, messages: list[Message], num_retries=0) -> Message:
         pass
 
 
@@ -39,7 +38,7 @@ class AzureOpenAIChatModel(ChatModel):
         self.timeout = timeout
         self.max_retries = max_retries
 
-    def query(self, messages: List[Message], num_retries=0, **kwargs) -> Message:
+    def query(self, messages: list[Message], num_retries=0, **kwargs) -> Message:
         try:
             response = openai.ChatCompletion.create(
                 engine=self.engine,
@@ -58,7 +57,7 @@ class AzureOpenAIChatModel(ChatModel):
             content=(response["choices"][0]["message"]["content"]),
         )
 
-    async def aquery(self, messages: List[Message], num_retries=0) -> Message:
+    async def aquery(self, messages: list[Message], num_retries=0) -> Message:
         try:
             response = await openai.ChatCompletion.acreate(
                 engine=self.engine,

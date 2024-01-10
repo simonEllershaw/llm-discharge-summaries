@@ -1,5 +1,3 @@
-from typing import List
-
 from pydantic import BaseModel
 
 
@@ -14,7 +12,7 @@ class Note(BaseModel):
 
 
 class Record(BaseModel):
-    physician_notes: List[Note]
+    physician_notes: list[Note]
     hadm_id: int
     subject_id: int
 
@@ -30,7 +28,7 @@ class ProblemSection(BaseModel):
 class BHC(BaseModel):
     hadm_id: int
     assessment_and_plan: str
-    problem_sections: List[ProblemSection]
+    problem_sections: list[ProblemSection]
     full_text: str
 
 

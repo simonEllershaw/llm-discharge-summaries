@@ -1,5 +1,3 @@
-from typing import List
-
 from pydantic import BaseModel, Field
 
 AUTOPOPULATED = "Autopopulated"
@@ -10,7 +8,7 @@ class PatientDemographics(BaseModel):
     date_of_birth: str = AUTOPOPULATED
     patient_address: str = AUTOPOPULATED
     nhs_number: str = AUTOPOPULATED
-    safety_alerts: List[str] = Field(
+    safety_alerts: list[str] = Field(
         description=(
             "Any alerts could be documented here eg treatment limitation decisions,"
             " multi-resistant organisms, refusal of specific managements eg blood"
@@ -33,7 +31,7 @@ class GP_Practice(BaseModel):
 
 
 class SocialContext(BaseModel):
-    social_context: List[str] = Field(
+    social_context: list[str] = Field(
         description=(
             "Includes elements such as lifestyle factors eg smoking status, alcohol,"
             " and social context, eg whether the person lives alone. This is"
@@ -59,7 +57,7 @@ class AdmissionDetails(BaseModel):
         # Amended
         description="Eg elective/emergency"
     )
-    relevant_past_medical_and_mental_health_history: List[str] = Field(
+    relevant_past_medical_and_mental_health_history: list[str] = Field(
         description=(
             "Whilst the GP is likely to hold this information it is useful for"
             " documents to stand-alone and provides an insight into the basis for"
@@ -77,7 +75,7 @@ class Diagnoses(BaseModel):
             " is not certain, record a symptom instead."
         )
     )
-    secondary_diagnoses: List[str] = Field(
+    secondary_diagnoses: list[str] = Field(
         description=(
             "Record any other diagnoses relevant to admission, such as: other"
             " conditions which impact on the treatment eg dementia, diabetes, COPD; "
@@ -97,7 +95,7 @@ class ClinicalSummary(BaseModel):
             " recorded as a summary narrative. Very concise, where possible."
         )
     )
-    procedures: List[str] = Field(
+    procedures: list[str] = Field(
         description=(
             "The details of any therapeutic or diagnostic procedures performed. This"
             " should be the name of the procedure, with additional comments if needed."
@@ -105,7 +103,7 @@ class ClinicalSummary(BaseModel):
             "Do not include procedures performed before this hospital admission."
         )
     )
-    investigation_results: List[str] = Field(
+    investigation_results: list[str] = Field(
         description=(
             "It is important to include results of investigations which the GP is"
             " likely to monitor either of the health condition or associated with"
@@ -134,9 +132,9 @@ class DischargeDetailsAndPlan(BaseModel):
 
 class PlanAndRequestedActions(BaseModel):
     # Altered
-    post_discharge_plan_and_requested_actions: List[str] = Field(
+    post_discharge_plan_and_requested_actions: list[str] = Field(
         description=(
-            "List detailing the hospital post-discharge management plan what is"
+            "list detailing the hospital post-discharge management plan what is"
             " expected of the GP following the patient's discharge. Make clear where"
             " the responsibility for actions lies (eg with the GP practice or"
             " hospital). eg Health or test monitoring, specialist services eg"
@@ -146,12 +144,12 @@ class PlanAndRequestedActions(BaseModel):
             " discharge."
         )
     )
-    information_and_advice_given: List[str] = Field(
+    information_and_advice_given: list[str] = Field(
         description=(
             "Note of information and advice given and patient/carer comprehension"
         )
     )
-    patient_and_carer_concerns_expectations_and_wishes: List[str] = Field(
+    patient_and_carer_concerns_expectations_and_wishes: list[str] = Field(
         description=(
             "Description of the concerns, wishes or goals of the person in relation to"
             " their care, as expressed by the person, their representative or carer."
@@ -251,6 +249,6 @@ class RCPGuidelines(BaseModel):
     diagnoses: Diagnoses
     clinical_summary: ClinicalSummary
     discharge_details: DischargeDetailsAndPlan
-    # medications: List[Medication] = "Autopopulated"
+    # medications: list[Medication] = "Autopopulated"
     plan_and_requested_actions: PlanAndRequestedActions
-    allergies_and_adverse_reaction: List[AllergiesAndAdverseReaction]
+    allergies_and_adverse_reaction: list[AllergiesAndAdverseReaction]

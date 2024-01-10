@@ -1,13 +1,12 @@
 import json
-from typing import Dict, List, Tuple
 
 from llm_discharge_summaries.openai_llm.message import Message, Role
 from llm_discharge_summaries.schemas.mimic import PhysicianNote
 
 
 def generate_diagnosis_summary_prompt(
-    diagnosis: str, ehr_extracts: List[str]
-) -> List[Message]:
+    diagnosis: str, ehr_extracts: list[str]
+) -> list[Message]:
     system_message = Message(
         role=Role.SYSTEM,
         content=f"""You are an expert medical assistant aiding a user to write a patient's discharge summary.
@@ -35,8 +34,8 @@ $[concise summary of information in the extracts regarding the diagnosis]
 
 
 def generate_bhc_paragraph_heading_extraction_prompt(
-    bhc_paragraph: str, examples: List[Tuple[str, str]]
-) -> List[Message]:
+    bhc_paragraph: str, examples: list[tuple[str, str]]
+) -> list[Message]:
     PREFIX = "What is the heading of this paragraph?\n\n"
 
     system_message = Message(
@@ -69,7 +68,7 @@ You can either reply with None or an exact string match from the user text.""",
     return [system_message, *few_shot_examples, user_message]
 
 
-def generate_rcp_system_message(json_schema: Dict) -> Message:
+def generate_rcp_system_message(json_schema: dict) -> Message:
     return Message(
         role=Role.SYSTEM,
         content=f"""You are a consultant doctor tasked with writing a patients discharge summary.
@@ -86,7 +85,7 @@ Expand all acronyms to their full terms.""",  # noqa,
     )
 
 
-def _deduplicate_physician_notes(notes: List[PhysicianNote]) -> List[PhysicianNote]:
+def _deduplicate_physician_notes(notes: list[PhysicianNote]) -> list[PhysicianNote]:
     seen_lines = set()
     deduplicated_notes = []
     for note in notes:
@@ -104,7 +103,7 @@ def _deduplicate_physician_notes(notes: List[PhysicianNote]) -> List[PhysicianNo
     return deduplicated_notes
 
 
-def _physician_notes_to_string(notes: List[PhysicianNote]) -> str:
+def _physician_notes_to_string(notes: list[PhysicianNote]) -> str:
     deduplicated_notes = _deduplicate_physician_notes(notes)
     deduplicated_notes = sorted(deduplicated_notes, key=lambda note: note.timestamp)
     notes_string = "\n\n".join(
@@ -113,7 +112,7 @@ def _physician_notes_to_string(notes: List[PhysicianNote]) -> str:
     return notes_string
 
 
-def generate_rcp_user_message(notes: List[PhysicianNote]) -> Message:
+def generate_rcp_user_message(notes: list[PhysicianNote]) -> Message:
     return Message(
         role=Role.USER,
         content=f"""Clinical Notes

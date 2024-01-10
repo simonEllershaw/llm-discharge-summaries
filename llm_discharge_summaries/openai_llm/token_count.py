@@ -1,12 +1,10 @@
-from typing import List
-
 import tiktoken
 
 from llm_discharge_summaries.openai_llm.message import Message
 
 
 def num_tokens_from_messages_azure_engine(
-    messages: List[Message], azure_engine: str, azure_api_version: str
+    messages: list[Message], azure_engine: str, azure_api_version: str
 ) -> int:
     azure_engine_and_version_to_openai_model = {
         "gpt-35-turbo-2023-07-01-preview": "gpt-3.5-turbo-0613",
@@ -25,7 +23,7 @@ def num_tokens_from_messages_azure_engine(
     return _num_tokens_from_messages(messages, model=model)
 
 
-def _num_tokens_from_messages(messages: List[Message], model: str) -> int:
+def _num_tokens_from_messages(messages: list[Message], model: str) -> int:
     """Return the number of tokens used by a list of messages.
     From https://github.com/openai/openai-cookbook/blob/5783656852d507c335955d14875ebc9902f628ef/examples/How_to_count_tokens_with_tiktoken.ipynb # noqa: E501
     """
