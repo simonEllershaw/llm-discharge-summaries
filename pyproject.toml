@@ -16,7 +16,8 @@ tiktoken = "^0.4.0"
 jsonschema = "^4.19.0"
 jsonref = "^1.1.0"
 pandas = "^2.1.4"
-pydantic = "^2.5.3"
+# pydantic fixed so schema generation is consitent
+pydantic = "1.7.4"
 openpyxl = "^3.1.2"
 python-docx = "^1.1.0"
 
