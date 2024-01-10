@@ -29,7 +29,7 @@ class GP_Practice(BaseModel):
             " their representative."
         )
     )
-    GP_practice_details = AUTOPOPULATED
+    GP_practice_details: str = AUTOPOPULATED
 
 
 class SocialContext(BaseModel):
@@ -251,6 +251,6 @@ class RCPGuidelines(BaseModel):
     diagnoses: Diagnoses
     clinical_summary: ClinicalSummary
     discharge_details: DischargeDetailsAndPlan
-    # medications: List[Medication]
+    # medications: List[Medication] = "Autopopulated"
     plan_and_requested_actions: PlanAndRequestedActions
     allergies_and_adverse_reaction: List[AllergiesAndAdverseReaction]

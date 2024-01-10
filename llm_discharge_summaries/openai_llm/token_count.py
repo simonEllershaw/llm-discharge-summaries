@@ -2,7 +2,7 @@ from typing import List
 
 import tiktoken
 
-from discharge_summaries.openai_llm.message import Message
+from llm_discharge_summaries.openai_llm.message import Message
 
 
 def num_tokens_from_messages_azure_engine(

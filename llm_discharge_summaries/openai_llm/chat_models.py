@@ -4,7 +4,7 @@ from typing import List
 import openai
 from openai.error import TryAgain
 
-from discharge_summaries.openai_llm.message import Message, Role
+from llm_discharge_summaries.openai_llm.message import Message, Role
 
 
 class ChatModel:

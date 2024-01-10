@@ -1,8 +1,8 @@
 import json
 from typing import Dict, List, Tuple
 
-from discharge_summaries.openai_llm.message import Message, Role
-from discharge_summaries.schemas.mimic import PhysicianNote
+from llm_discharge_summaries.openai_llm.message import Message, Role
+from llm_discharge_summaries.schemas.mimic import PhysicianNote
 
 
 def generate_diagnosis_summary_prompt(
