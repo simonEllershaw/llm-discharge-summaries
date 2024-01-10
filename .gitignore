@@ -1,4 +1,4 @@
-data/*
+mimic_experiments/inputs/*
 models/*
 *.bin
 *.json
