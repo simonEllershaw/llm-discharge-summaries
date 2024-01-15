@@ -12,17 +12,39 @@ In brief the method is:
 
 ## Setup
 
-Requirements [poetry](https://python-poetry.org/docs/) and approval to access to [MIMIC-III](https://physionet.org/content/mimiciii/1.4/)
+Requirements
+1. Installed [poetry](https://python-poetry.org/docs/) and to
+1. Approval to access [MIMIC-III](https://physionet.org/content/mimiciii/1.4/)
+1. Ability to deploy Azure OpenAI models
 
-Install required packages
+### Install required packages
 
-`poetry install`
+```bash
+poetry install
+```
 
-Download mimic-III notes
+### Download and unzip MIMIC-III notes
 
-`wget -r -N -c -np --user simonellershawucl --ask-password -P ./mimic_experiments/inputs/ https://physionet.org/files/mimiciii/1.4/NOTEEVENTS.csv.gz`
+```bash
+wget -r -N -c -np --user simonellershawucl --ask-password -P ./mimic_experiments/inputs/ https://physionet.org/files/mimiciii/1.4/NOTEEVENTS.csv.gz
+gzip -d mimic_experiments/inputs/physionet.org/files/mimiciii/1.4/NOTEEVENTS.csv.gz
+```
 
-`gzip -d mimic_experiments/inputs/physionet.org/files/mimiciii/1.4/NOTEEVENTS.csv.gz`
+### Deploy GPT-4-turbo through Azure
+1. Deployment steps are set out [here](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal)
+1. To recreate results must be "gpt-4" version "1106-Preview"
+1. IMPORTANT: Turn off content filter to follow [MIMIC's terms of use](https://physionet.org/news/post/415)
+
+Note gpt-4-turbo is only available in certain regions ([see docs](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models#gpt-4-and-gpt-4-turbo-preview-model-availability))
+
+### Setup Azure OpenAI Credentials
+Changing out the values for your personal credentials
+
+```bash
+echo "AZURE_OPENAI_KEY_1 = <YOUR_AZURE_OPENAI_KEY>" >> .env
+
+echo "AZURE_OPENAI_ENDPOINT_1 = <YOUR_AZURE_OPENAI_ENDPOINT>" >> .env
+```
 
 ## Running
 
