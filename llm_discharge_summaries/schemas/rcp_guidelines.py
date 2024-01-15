@@ -249,6 +249,7 @@ class RCPGuidelines(BaseModel):
     diagnoses: Diagnoses
     clinical_summary: ClinicalSummary
     discharge_details: DischargeDetailsAndPlan
-    # medications: list[Medication] = "Autopopulated"
+    # Not included as requires inclusion of structured e-prescribing data
+    # medications: list[Medication]
     plan_and_requested_actions: PlanAndRequestedActions
     allergies_and_adverse_reaction: list[AllergiesAndAdverseReaction]
