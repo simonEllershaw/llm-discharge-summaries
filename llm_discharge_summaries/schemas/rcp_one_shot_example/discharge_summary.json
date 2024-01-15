@@ -1,0 +1,69 @@
+{
+    "patient_demographics": {
+        "safety_alerts": [
+            "Dual antiplatelet therapy",
+            "Drug allergies (see allergies and adverse reactions)"
+        ]
+    },
+    "GP_practice": {
+        "GP_name": "Dr Xavier"
+    },
+    "social_context": {
+        "social_context": [
+            "Smoker"
+        ]
+    },
+    "admission_details": {
+        "reason_for_admission": "Chest tightness pain, breathlessness, nausea and dizziness started at 6 am.",
+        "admission_method": "Emergency admission via London Ambulance Service",
+        "relevant_past_medical_and_mental_health_history": [
+            "Type 2 Diabetes medication (tablets)",
+            "Hypertension",
+            "Chronic Obstructive Pulmonary Disease"
+        ]
+    },
+    "diagnoses": {
+        "primary_diagnosis": "Inferior ST-segment elevation myocardial infarction (STEMI) heart attack",
+        "secondary_diagnoses": [
+            "Infective Chronic Obstructive Pulmonary Disease (IECOPD)"
+        ]
+    },
+    "clinical_summary": {
+        "clinical_summary": "Mrs Grey was admitted via a Primary Angioplasty in Myocardial Infarction (PAMI) call to the cath lab where she underwent revascularisation with a successful percutaneous coronary intervention (PCI) to right coronary artery (RCA) with a drug-eluting stent (DES). She developed a chesty cough a few days post procedure associated with a mild rise in inflammatory markers which was treated as an IECOPD with oral doxycycline. Otherwise she has made a good clinical recovery.",
+        "procedures": [
+            "PCI to distal mid vessel and distal RCA with DES",
+            "Residual diffuse left anterior descending (LAD) disease with moderate to severe D1 disease (for initial medical management)"
+        ],
+        "investigation_results": [
+            "ECHO: The left ventricle is normal in size; left ventricular fraction is mildly reduced ejection fraction (EF) 45%. Overall the right ventricular systolic function is at least mildly impaired. At least mild mitral regurgitation. Moderate sized septal and inferior wall motion abnormality with hypokinesis to akinesis of the segments."
+        ]
+    },
+    "discharge_details": {
+        "discharge_destination": "Own home"
+    },
+    "plan_and_requested_actions": {
+        "post_discharge_plan_and_requested_actions": [
+            "Please review BP, HR and U&Es on discharge and titrate beta-blocker and ACE-I as appropriate; please review lipids asnd LFTS on discharge - statin uptitrated.",
+            "Cardiac rehabilitation to be organised - details to follow",
+            "Integrated Respiratory Team follow-up to be organised - details to follow"
+        ],
+        "information_and_advice_given": [
+            "Current smoker - trialling nicotine replacement therapy; referred to local smkoing cessation service"
+        ],
+        "patient_and_carer_concerns_expectations_and_wishes": [
+            "Jean expressed a desire to stop smoking.",
+            "Patient given the myocardial infarction discharge information pack and we talked through this together."
+        ],
+        "next_appointment_details": "Cardiology outpatient department (OPD) 3/12/18 - details to follow"
+    },
+    "allergies_and_adverse_reaction": [
+        {
+            "causative_agent": "Tetracycline",
+            "description_of_reaction": "Rash"
+        },
+        {
+            "causative_agent": "Septrin",
+            "description_of_reaction": "Rash"
+        }
+    ]
+}
