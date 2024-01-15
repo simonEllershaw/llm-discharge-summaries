@@ -5,10 +5,10 @@ This repo contains the experimental code for the paper "Automated Generation of 
 ![Method Diagrame](figures/end_to_end.png)
 
 In brief the method is:
-1. Convert a set of guidelines from the Royal College of Physcians London (RCP) into a json schema
+1. Convert a set of [guidelines from the Royal College of Physcians London](https://www.rcplondon.ac.uk/guidelines-policy/improving-discharge-summaries-learning-resource-materials) (RCP) into a json schema
 1. Convert an example also provided by RCP into a 1 shot prompt
-1. De-duplicate a set of physician notes (MIMIC-III used for experiments)
-1. Use the above as a prompt to an LLM (GPT-4-turbo)
+1. De-duplicate a set of physician notes ([MIMIC-III](https://physionet.org/content/mimiciii/1.4/) used for experiments)
+1. Use the above as a prompt to an LLM ([GPT-4-turbo](https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo))
 
 ## Setup
 
