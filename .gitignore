@@ -5,6 +5,7 @@
 *.csv
 
 !llm_discharge_summaries/schemas/rcp_one_shot_example/*
+!mimic_experiments/outputs/simplified_rcp_schema.json
 
 .DS_Store
 # Byte-compiled / optimized / DLL files

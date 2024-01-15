@@ -1,0 +1,182 @@
+{
+    "description": "The discharge summary should be brief, containing only pertinent information on the\nhospital episode, rather than duplicating information which GPs already have access to in their own records.",
+    "type": "object",
+    "properties": {
+        "patient_demographics": {
+            "$ref": "#/definitions/PatientDemographics"
+        },
+        "GP_practice": {
+            "$ref": "#/definitions/GP_Practice"
+        },
+        "social_context": {
+            "$ref": "#/definitions/SocialContext"
+        },
+        "admission_details": {
+            "$ref": "#/definitions/AdmissionDetails"
+        },
+        "diagnoses": {
+            "$ref": "#/definitions/Diagnoses"
+        },
+        "clinical_summary": {
+            "$ref": "#/definitions/ClinicalSummary"
+        },
+        "discharge_details": {
+            "$ref": "#/definitions/DischargeDetailsAndPlan"
+        },
+        "plan_and_requested_actions": {
+            "$ref": "#/definitions/PlanAndRequestedActions"
+        },
+        "allergies_and_adverse_reaction": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/AllergiesAndAdverseReaction"
+            }
+        }
+    },
+    "definitions": {
+        "PatientDemographics": {
+            "type": "object",
+            "properties": {
+                "safety_alerts": {
+                    "description": "Any alerts could be documented here eg treatment limitation decisions, multi-resistant organisms, refusal of specific managements eg blood products; safeguarding concerns. This includes risks to self (eg suicide, overdose, self-harm, neglect), to others (to carers, professionals or others) and risks from others (risk from an identified person eg family member).",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "GP_Practice": {
+            "type": "object",
+            "properties": {
+                "GP_name": {
+                    "description": "Name of a patient's general practitioner, if offered by the patient or their representative.",
+                    "type": "string"
+                }
+            }
+        },
+        "SocialContext": {
+            "type": "object",
+            "properties": {
+                "social_context": {
+                    "description": "Includes elements such as lifestyle factors eg smoking status, alcohol, and social context, eg whether the person lives alone. This is particularly important if the admission and discharge locations differ. Consider what information a new carer would need to know. More detailed information would be recorded in forms, such as 'This is me' form for dementia patients. Also includes educational history.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "AdmissionDetails": {
+            "type": "object",
+            "properties": {
+                "reason_for_admission": {
+                    "description": "The main reason why the patient was admitted to hospital, eg chest pain, breathlessness, collapse, etc. This should be symptoms and not the diagnosis.",
+                    "type": "string"
+                },
+                "admission_method": {
+                    "description": "Eg elective/emergency",
+                    "type": "string"
+                },
+                "relevant_past_medical_and_mental_health_history": {
+                    "description": "Whilst the GP is likely to hold this information it is useful for documents to stand-alone and provides an insight into the basis for clinical decisions. Includes relevant previous diagnoses, problems and issues, procedures, investigations, specific anaesthesia issues, etc",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "Diagnoses": {
+            "type": "object",
+            "properties": {
+                "primary_diagnosis": {
+                    "description": "Confirmed primary diagnosis (or symptoms); active diagnosis being treated. Record to highest level of certainty, eg do not record a diagnosis if it is not certain, record a symptom instead.",
+                    "type": "string"
+                },
+                "secondary_diagnoses": {
+                    "description": "Record any other diagnoses relevant to admission, such as: other conditions which impact on the treatment eg dementia, diabetes, COPD;  complications during admission eg venous thromboembolism, hospital acquired pneumonia; or incidental new diagnoses. Do not include diagnoses made before this hospital admission.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "ClinicalSummary": {
+            "type": "object",
+            "properties": {
+                "clinical_summary": {
+                    "description": "Details of the patient's journey can be written in this section, including details about the patient's admission and response to treatments, recorded as a summary narrative. Very concise, where possible.",
+                    "type": "string"
+                },
+                "procedures": {
+                    "description": "The details of any therapeutic or diagnostic procedures performed. This should be the name of the procedure, with additional comments if needed.Do not include procedures performed before this hospital admission.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "investigation_results": {
+                    "description": "It is important to include results of investigations which the GP is likely to monitor either of the health condition or associated with medication use eg renal function in patients with diabetes or prescribed an ACE inhibitor. This is also an opportunity to provide more detail on medical problems not related to the main admission eg current lung function tests in patient with COPD admission for elective procedure, cardiac echogram , chest x-ray, mri scan, etc. Each investigation is a separate element in the list.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "DischargeDetailsAndPlan": {
+            "type": "object",
+            "properties": {
+                "discharge_destination": {
+                    "description": "Highlight when different to patient's usual address and if permanent or interim arrangement eg residential care, rehabilitation facility, local hospital (from tertiary centre)",
+                    "type": "string"
+                }
+            }
+        },
+        "PlanAndRequestedActions": {
+            "type": "object",
+            "properties": {
+                "post_discharge_plan_and_requested_actions": {
+                    "description": "list detailing the hospital post-discharge management plan what is expected of the GP following the patient's discharge. Make clear where the responsibility for actions lies (eg with the GP practice or hospital). eg Health or test monitoring, specialist services eg Macmillan, Diabetes, Optometry. Do not include jobs that are still to be done in hospital before discharge.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "information_and_advice_given": {
+                    "description": "Note of information and advice given and patient/carer comprehension",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "patient_and_carer_concerns_expectations_and_wishes": {
+                    "description": "Description of the concerns, wishes or goals of the person in relation to their care, as expressed by the person, their representative or carer. Also record who has expressed these. Where the person lacks capacity this may include their representative's concerns, expectations or wishes.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "next_appointment_details": {
+                    "description": "Details of booked follow-up appointment. State who the appointment is with booked eg outpatient department. Note date and contact details if available.",
+                    "type": "string"
+                }
+            }
+        },
+        "AllergiesAndAdverseReaction": {
+            "type": "object",
+            "properties": {
+                "causative_agent": {
+                    "description": "The agent such as food, drug or substances that has caused or may cause an allergy intolerance or adverse reaction in this patient.",
+                    "type": "string"
+                },
+                "description_of_reaction": {
+                    "description": "A description of the manifestation of the allergic reaction experienced by the patient. Eg skin rash.",
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
