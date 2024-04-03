@@ -1,6 +1,6 @@
 # LLM Discharge Summaries
 
-This repo contains the experimental code for the paper "Automated Generation of Hospital Discharge Summaries Using Clinical Guidelines and Large Language Models"
+This repo contains the experimental code for the paper ["Automated Generation of Hospital Discharge Summaries Using Clinical Guidelines and Large Language Models"](https://openreview.net/forum?id=1kDJJPppRG&trk=public_post_comment-text)
 
 ![Method Diagrame](figures/end_to_end.png)
 
@@ -59,6 +59,18 @@ Also the code used to generate the metrics (notebook 5) is given for transparenc
 
 - Simple Streamlit demo
 - Some code decisions were suboptimal but are entrenched for reproducbility (e.g. dealing with empty json values when creating annotator excels rather than when saving to json)
+
+## Citing
+
+If using any of the code or ideas in this repo please cite us!
+```
+@inproceedings{ellershaw2024automated,
+  title={Automated Generation of Hospital Discharge Summaries Using Clinical Guidelines and Large Language Models},
+  author={Ellershaw, Simon and Tomlinson, Christopher and Burton, Oliver E and Frost, Thomas and Hanrahan, John Gerrard and Khan, Danyal Zaman and Horsfall, Hugo Layard and Little, Mollie and Malgapo, Evaleen and Starup-Hansen, Joachim and others},
+  booktitle={AAAI 2024 Spring Symposium on Clinical Foundation Models},
+  year={2024}
+}
+```
 
 ## Contact
 
