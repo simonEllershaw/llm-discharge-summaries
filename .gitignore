@@ -8,6 +8,9 @@
 !mimic_experiments/outputs/simplified_rcp_schema.json
 mimic_experiments/models/*
 !mimic_experiments/models/.gitkeep
+mimic_experiments/outputs/*
+!mimic_experiments/models/.gitkeep
+!mimic_experiments/outputs/simplified_rcp_schema.json
 
 .DS_Store
 # Byte-compiled / optimized / DLL files

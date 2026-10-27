@@ -26,6 +26,7 @@ medcat = {extras = ["spacy"], version = "^2.9.0"}
 scipy = "^1.13.0"
 jupyterlab = "^4.1.8"
 tiktoken = "^0.14.0"
+tabulate = "^0.10.0"
 
 
 [build-system]
