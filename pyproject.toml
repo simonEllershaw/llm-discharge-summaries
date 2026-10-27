@@ -7,12 +7,11 @@ readme = "README.md"
 packages = [{include = "llm_discharge_summaries"}]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.12,<3.16"
 jupyter = "^1.0.0"
 python-dotenv = "^1.0.0"
 openai = "^0.27.8"
 matplotlib = "^3.7.2"
-tiktoken = "^0.4.0"
 jsonschema = "^4.19.0"
 jsonref = "^1.1.0"
 pandas = "^2.1.4"
@@ -23,9 +22,10 @@ pydantic = "^2.14.1"
 python-docx = "^1.1.0"
 transformers = "^4.38.2"
 torch = "^2.2.1"
-medcat = "^2.9.0"
+medcat = {extras = ["spacy"], version = "^2.9.0"}
 scipy = "^1.13.0"
 jupyterlab = "^4.1.8"
+tiktoken = "^0.14.0"
 
 
 [build-system]
