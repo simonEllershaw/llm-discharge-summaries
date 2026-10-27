@@ -7,6 +7,7 @@
 !llm_discharge_summaries/schemas/rcp_one_shot_example/*
 !mimic_experiments/outputs/simplified_rcp_schema.json
 mimic_experiments/models/*
+!mimic_experiments/models/.gitkeep
 
 .DS_Store
 # Byte-compiled / optimized / DLL files
