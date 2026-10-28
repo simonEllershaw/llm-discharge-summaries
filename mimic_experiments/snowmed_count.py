@@ -34,7 +34,7 @@ def load_clinical_summaries() -> pd.DataFrame:
             df = pd.read_excel(excel_path, engine="openpyxl", header=1)
             eval_dfs.append(df[df["Field"] == "Clinical Summary"])
 
-    clinical_summaries = pd.concat(eval_dfs).drop_duplicates(subset=["Value"]).copy()
+    clinical_summaries = pd.concat(eval_dfs)
     clinical_summaries[ERROR_COLUMNS] = clinical_summaries[ERROR_COLUMNS].fillna(0)
     return clinical_summaries
 
@@ -49,29 +49,23 @@ def format_median_iqr(series: pd.Series) -> str:
 
 def compute_metrics_table(clinical_summaries: pd.DataFrame) -> pd.DataFrame:
     """Computes evaluation metrics using sentences vs SNOMED concepts as predicted positives."""
-    fp_series = (
+    total_fp = (
         clinical_summaries["Added- Hallucination"] + clinical_summaries["Added- Not relevant"]
-    )
-    fn_series = (
+    ).sum()
+    total_fn = (
         clinical_summaries["Missed- Severe"] + clinical_summaries["Missed- Minor"]
-    )
-    total_fp = fp_series.sum()
-    total_fn = fn_series.sum()
+    ).sum()
 
     rows = []
     for method, col in [("Sentence extraction", "Sentence Count"), ("Snowmed extraction", "SNOMED Count")]:
         positives_series = clinical_summaries[col]
-        tp_series = (positives_series - fp_series).clip(lower=0)
-
         total_positives = positives_series.sum()
         total_tp = total_positives - total_fp
         recall = total_tp / (total_tp + total_fn)
-        precision = total_tp / (total_tp + total_fp)
+        precision = total_tp / total_positives
         f1 = 2 * (precision * recall) / (precision + recall)
         rows.append({
             "Positive Predictions": format_median_iqr(positives_series),
-            "True Positives": format_median_iqr(tp_series),
-            "False Positives": format_median_iqr(fp_series),
             "Recall": recall,
             "Precision": precision,
             "F1": f1,
@@ -82,6 +76,7 @@ def compute_metrics_table(clinical_summaries: pd.DataFrame) -> pd.DataFrame:
 
 if __name__ == "__main__":
     clinical_summaries = load_clinical_summaries()
+    print(f"Number of clinical summaries: {len(clinical_summaries)}")
 
     print("Loading model pack...")
     cat = CAT.load_model_pack(str(MODEL_PACK_PATH))
@@ -98,15 +93,15 @@ if __name__ == "__main__":
         for text in clinical_summaries["Value"]
     ]
 
-    print(f"Average number of sentences per summary: {clinical_summaries['Sentence Count'].mean():.2f}")
-    print(f"Average number of SNOMED concepts per summary: {clinical_summaries['SNOMED Count'].mean():.2f}")
+    print(f"Average number of sentences per summary: {clinical_summaries['Sentence Count'].mean():.3f}")
+    print(f"Average number of SNOMED concepts per summary: {clinical_summaries['SNOMED Count'].mean():.3f}")
 
     metrics_df = compute_metrics_table(clinical_summaries)
     print("\nMetrics Table:")
     print(metrics_df)
 
     CONCEPT_COUNT_DIR.mkdir(parents=True, exist_ok=True)
-    (CONCEPT_COUNT_DIR / "table.md").write_text(metrics_df.to_markdown(floatfmt=".2f"))
-    (CONCEPT_COUNT_DIR / "table.tex").write_text(metrics_df.to_latex(float_format="%.2f"))
+    (CONCEPT_COUNT_DIR / "table.md").write_text(metrics_df.to_markdown(floatfmt=".3f"))
+    (CONCEPT_COUNT_DIR / "table.tex").write_text(metrics_df.to_latex(float_format="%.3f"))
 
     print(f"\nOutputs written to:\n - {CONCEPT_COUNT_DIR / 'table.md'}\n - {CONCEPT_COUNT_DIR / 'table.tex'}")
