@@ -54,6 +54,11 @@ But the notebooks (from 1-4) in `mimic_experiments/` allows for recreation of al
 
 Also the code used to generate the metrics (notebook 5) is given for transparency however cannot be run without access to the clinical annotation. If this is of interest and you are a credentialed MIMIC user please reach out.
 
+### Extra Analysis
+
+mimic_experiments/snowmed_count.py was added after paper release (for final PhD thesis). It is standalone and runs via `poetry run python snowmed_count.py` from inside `mimic_experiments` file.
+
+To run this a MedCAT model is needed (see [docs](https://docs.cogstack.org/en/latest/medcat/medcat/docs/)) in a zip file placed in `mimic_experiments/models` and a reasonable amount of RAM (>16GB).
 
 ## Future Work
 
